@@ -31,8 +31,10 @@ public class AuthController {
     private final UserService userService;
     private final ObjectMapper mapper;
 
-    @Autowired
-    ProfileRepository profileRepository;
+    // ProfileRepository는 주석 처리
+    // @Autowired
+    // ProfileRepository profileRepository;
+
     @Autowired
     UserRepository userRepository;
 
@@ -68,29 +70,32 @@ public class AuthController {
                         findUser = userService.findUser(userId); // 다시 조회하여 findUser에 저장
                     }
 
-                    // 프로필 정보가 있는지 확인
+                    // 프로필 정보가 있는지 확인하는 부분 주석 처리
+                    /*
                     Map<String, Object> profileMap = new HashMap<>();
                     Profile findProfile = profileRepository.findProfileByProfileId(findUser.getId());
 
-                    //JsonNode profileNode = bodyNode.get("profile");
                     if (findProfile != null) {
-                        profileMap.put("profileId",findProfile.getProfileId());
+                        profileMap.put("profileId", findProfile.getProfileId());
                         String imagePath = findProfile.getImagePath();
-                        profileMap.put("image",  imagePath);
+                        profileMap.put("image", imagePath);
                     }
+                    */
 
                     // User 엔티티의 id 필드 포함하여 JSON 응답 생성
                     Map<String, Object> userInfoMap = new HashMap<>();
-                    userInfoMap.put("id", findUser.getId());
+                    //userInfoMap.put("id", findUser.getId());
                     userInfoMap.put("name", name);
                     userInfoMap.put("department", department);
                     userInfoMap.put("grade", grade);
                     userInfoMap.put("status", status);
 
+                    // profile 관련 부분 주석 처리
+                    /*
                     if (!profileMap.isEmpty()) {
                         userInfoMap.put("profile", profileMap);
-
                     }
+                    */
 
                     String userInfoJson = mapper.writeValueAsString(userInfoMap);
                     return ResponseEntity.ok(userInfoJson);
@@ -111,12 +116,14 @@ public class AuthController {
         User findUser = userRepository.findUserById(Long.valueOf(userId));
 
         Map<String, Object> userInfoMap = new HashMap<>();
-        userInfoMap.put("id", findUser.getId());
-        userInfoMap.put("name", findUser.getName());
-        userInfoMap.put("department", findUser.getDepartment());
-        userInfoMap.put("grade", findUser.getGrade());
-        userInfoMap.put("status", findUser.getStatus());
-        userInfoMap.put("image", findUser.getProfile().getImagePath());
+//        userInfoMap.put("id", findUser.getId());
+//        userInfoMap.put("name", findUser.getName());
+//        userInfoMap.put("department", findUser.getDepartment());
+//        userInfoMap.put("grade", findUser.getGrade());
+//        userInfoMap.put("status", findUser.getStatus());
+
+        // 프로필 정보 주석 처리
+        // userInfoMap.put("image", findUser.getProfile().getImagePath());
 
         String userInfoJson = mapper.writeValueAsString(userInfoMap);
         return ResponseEntity.ok(userInfoJson);

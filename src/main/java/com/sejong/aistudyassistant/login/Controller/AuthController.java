@@ -84,7 +84,7 @@ public class AuthController {
 
                     // User 엔티티의 id 필드 포함하여 JSON 응답 생성
                     Map<String, Object> userInfoMap = new HashMap<>();
-                    //userInfoMap.put("id", findUser.getId());
+                    userInfoMap.put("id", findUser.getId());
                     userInfoMap.put("name", name);
                     userInfoMap.put("department", department);
                     userInfoMap.put("grade", grade);

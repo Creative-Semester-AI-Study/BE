@@ -53,8 +53,9 @@ public class UserService {
 
             // Profile을 사용하지 않도록 수정
             //User user = new User(userId, name, major, status, grade, null); // user entity 생성
+            User user = new User(userId, name, major, status, grade); // user entity 생성
             // System.out.println("ProfileId: " + user.getProfile().getProfileId());
-            //userRepository.save(user);
+            userRepository.save(user);
 
             // Profile과의 연관 관계 주석 처리
             // profile.setUser(user);

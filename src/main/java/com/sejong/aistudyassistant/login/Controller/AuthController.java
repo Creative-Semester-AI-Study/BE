@@ -3,6 +3,10 @@ package com.sejong.aistudyassistant.login.Controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sejong.aistudyassistant.profile.Profile;
+import com.sejong.aistudyassistant.profile.ProfileRepository;
+import com.sejong.aistudyassistant.profile.ProfileService;
+import com.sejong.aistudyassistant.profile.dto.ProfileResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +35,12 @@ public class AuthController {
     private final UserService userService;
     private final ObjectMapper mapper;
 
-    // ProfileRepository는 주석 처리
-    // @Autowired
-    // ProfileRepository profileRepository;
+    @Autowired
+    ProfileRepository profileRepository;
 
     @Autowired
     UserRepository userRepository;
+    private final ProfileService profileService;
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody AuthRequestDto request) {
@@ -62,27 +66,23 @@ public class AuthController {
                     String grade = bodyNode.get("grade").asText();
                     String status = bodyNode.get("status").asText();
 
-
                     Long userId = Long.parseLong(id);
-                    User findUser = userService.findUser(userId); // user 정보 있나 확인
-                    if (findUser == null) {
-                        userService.saveUserFromJsonResponse(responseBody, userId); // 없으면 새로 저장
-                        findUser = userService.findUser(userId); // 다시 조회하여 findUser에 저장
+                    User findUser = userService.findUser(userId);
+
+                    // Log to check if findUser has been retrieved
+                    if (findUser != null) {
+                        log.info("User found: {}", findUser);
+                    } else {
+                        // User 저장
+                        userService.saveUserFromJsonResponse(responseBody, userId);
+                        findUser = userService.findUser(userId);
+                        log.info("User created: {}", findUser);
+
+                        // Profile 생성 (User가 저장된 이후에 실행)
+                        profileService.createProfile(findUser);
                     }
 
-                    // 프로필 정보가 있는지 확인하는 부분 주석 처리
-                    /*
-                    Map<String, Object> profileMap = new HashMap<>();
-                    Profile findProfile = profileRepository.findProfileByProfileId(findUser.getId());
-
-                    if (findProfile != null) {
-                        profileMap.put("profileId", findProfile.getProfileId());
-                        String imagePath = findProfile.getImagePath();
-                        profileMap.put("image", imagePath);
-                    }
-                    */
-
-                    // User 엔티티의 id 필드 포함하여 JSON 응답 생성
+                    // User 엔티티의 정보와 함께 JSON 응답 생성
                     Map<String, Object> userInfoMap = new HashMap<>();
                     userInfoMap.put("id", findUser.getId());
                     userInfoMap.put("name", name);
@@ -90,12 +90,13 @@ public class AuthController {
                     userInfoMap.put("grade", grade);
                     userInfoMap.put("status", status);
 
-                    // profile 관련 부분 주석 처리
-                    /*
-                    if (!profileMap.isEmpty()) {
-                        userInfoMap.put("profile", profileMap);
+                    //프로필 데이터 추가
+                    profileService.createProfile(findUser);
+                    // Profile 정보 추가 (생성된 프로필 조회)
+                    ProfileResponse profile = profileService.getProfileByUserId(findUser.getUserId()).orElse(null);
+                    if (profile != null) {
+                        userInfoMap.put("profile", profile);
                     }
-                    */
 
                     String userInfoJson = mapper.writeValueAsString(userInfoMap);
                     return ResponseEntity.ok(userInfoJson);
@@ -111,16 +112,18 @@ public class AuthController {
         }
     }
 
+
+
     @GetMapping("/{userId}/getUserInfo")
     public ResponseEntity<String> getuserinfo(@PathVariable String userId) throws JsonProcessingException {
         User findUser = userRepository.findUserById(Long.valueOf(userId));
 
         Map<String, Object> userInfoMap = new HashMap<>();
-//        userInfoMap.put("id", findUser.getId());
-//        userInfoMap.put("name", findUser.getName());
-//        userInfoMap.put("department", findUser.getDepartment());
-//        userInfoMap.put("grade", findUser.getGrade());
-//        userInfoMap.put("status", findUser.getStatus());
+        userInfoMap.put("id", findUser.getUserId());
+        userInfoMap.put("name", findUser.getName());
+        userInfoMap.put("department", findUser.getDepartment());
+        userInfoMap.put("grade", findUser.getGrade());
+        userInfoMap.put("status", findUser.getStatus());
 
         // 프로필 정보 주석 처리
         // userInfoMap.put("image", findUser.getProfile().getImagePath());

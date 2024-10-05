@@ -1,31 +1,11 @@
-package com.sejong.aistudyassistant.subject;
+package com.sejong.aistudyassistant.subject.dto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-
-@Entity
-public class Subject {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class CreateSubjectRequest {
     private Long subjectId;
-
-    @Column(nullable = false)
     private Long profileId;
-
-    @Column(nullable = false)
     private Long textTransformId;
-
-    @Column(nullable = false)
     private Long summaryId;
-
-    @Column(nullable = false)
     private Long quizId;
-
-    @Column(nullable = false, length = 100)
     private String subjectName;
 
     // Getters and Setters

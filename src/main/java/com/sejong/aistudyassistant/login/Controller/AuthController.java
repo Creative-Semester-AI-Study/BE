@@ -92,7 +92,7 @@ public class AuthController {
 
                     //프로필 데이터 추가
                     profileService.createProfile(findUser);
-                    // Profile 정보 추가 (생성된 프로필 조회)
+                    //Profile 정보 추가 (생성된 프로필 조회)
                     ProfileResponse profile = profileService.getProfileByUserId(findUser.getUserId()).orElse(null);
                     if (profile != null) {
                         userInfoMap.put("profile", profile);

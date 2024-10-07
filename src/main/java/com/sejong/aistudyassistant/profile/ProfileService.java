@@ -25,17 +25,25 @@ public class ProfileService {
     public Profile createProfile(User user) {
         logger.info("Creating profile for userId: {}", user.getUserId());
 
+        // 먼저 userId로 프로필이 이미 존재하는지 확인합니다.
+        Optional<Profile> existingProfile = profileRepository.findByUserId(user.getId());
+        if (existingProfile.isPresent()) {
+            logger.info("Profile already exists for userId: {}. Returning existing profile.", user.getUserId());
+            return existingProfile.get();
+        }
+
+        // 프로필이 존재하지 않는 경우 새로 생성합니다.
         Profile profile = new Profile();
         profile.setUserId(user.getId());
         profile.setStudentId(user.getUserId());
         profile.setStudentName(user.getName());
         // 프로필 이미지 설정 로직이 있다면 추가하세요
 
-
         Profile savedProfile = profileRepository.save(profile);
         logger.info("Profile created successfully with ID: {}", savedProfile.getProfileId());
         return savedProfile;
     }
+
 
 
     public Optional<ProfileResponse> getProfileByUserId(Long userId) {

@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/subject")
+@RequestMapping("/study/myPage")
 public class SubjectController {
 
     @Autowired

@@ -2,6 +2,8 @@ package com.sejong.aistudyassistant.subject;
 
 import com.sejong.aistudyassistant.mypage.MyPage;
 import com.sejong.aistudyassistant.mypage.MyPageRepository;
+import com.sejong.aistudyassistant.profile.Profile;
+import com.sejong.aistudyassistant.profile.ProfileRepository;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectRequest;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,9 @@ public class SubjectService {
 
     @Autowired
     private MyPageRepository myPageRepository;
+
+    @Autowired
+    private ProfileRepository profileRepository;
 
     public CreateSubjectResponse createSubject(CreateSubjectRequest request) {
         Subject newSubject = new Subject();
@@ -56,5 +61,21 @@ public class SubjectService {
                 savedSubject.getQuizId(),
                 savedSubject.getSubjectName()
         );
+    }
+
+    // 특정 유저의 특정 과목 삭제 (userId를 사용하여)
+    public boolean deleteSubject(Long userId, Long subjectId) {
+        // userId로 profile 조회
+        Profile profile = profileRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Profile not found for userId: " + userId));
+
+        // profileId와 subjectId로 과목 조회 및 삭제
+        Subject subject = subjectRepository.findByProfileIdAndSubjectId(profile.getProfileId(), subjectId);
+        if (subject != null) {
+            subjectRepository.delete(subject);
+            return true;  // 삭제 성공 시 true 반환
+        } else {
+            return false; // 해당 유저의 과목이 없으면 false 반환
+        }
     }
 }

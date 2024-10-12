@@ -2,6 +2,8 @@ package com.sejong.aistudyassistant.profile;
 
 import com.sejong.aistudyassistant.login.Entity.User;
 import com.sejong.aistudyassistant.login.Repository.UserRepository;
+import com.sejong.aistudyassistant.mypage.MyPage;
+import com.sejong.aistudyassistant.mypage.MyPageRepository;
 import com.sejong.aistudyassistant.profile.dto.ProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,7 @@ public class ProfileService {
     private ProfileRepository profileRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private MyPageRepository myPageRepository;
 
     // User 정보로 Profile 생성
     public Profile createProfile(User user) {
@@ -41,10 +43,15 @@ public class ProfileService {
 
         Profile savedProfile = profileRepository.save(profile);
         logger.info("Profile created successfully with ID: {}", savedProfile.getProfileId());
+
+        // 프로필 생성 시 마이페이지에 profile_id만 포함하는 마이페이지 테이블 생성
+        MyPage myPage = new MyPage();
+        myPage.setProfileId(savedProfile.getProfileId());  // Profile 객체 대신 profileId만 저장
+
+        myPageRepository.save(myPage);
+
         return savedProfile;
     }
-
-
 
     public Optional<ProfileResponse> getProfileByUserId(Long userId) {
         return profileRepository.findByUserId(userId)

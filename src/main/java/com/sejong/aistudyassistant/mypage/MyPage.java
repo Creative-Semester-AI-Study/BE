@@ -1,10 +1,6 @@
 package com.sejong.aistudyassistant.mypage;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 
 @Entity
 public class MyPage {
@@ -13,31 +9,20 @@ public class MyPage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long myPageId;
 
-    @Column(nullable = false)
-    private Long userId;
-
-    // profileId와 subjectId 필드를 추가합니다.
+    // profileId를 직접 저장
     @Column(nullable = false)
     private Long profileId;
 
-    @Column(nullable = false)
+    // 기타 필드들...
     private Long subjectId;
 
-    // Getter 및 Setter 추가
+    // Getters and Setters
     public Long getMyPageId() {
         return myPageId;
     }
 
     public void setMyPageId(Long myPageId) {
         this.myPageId = myPageId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public Long getProfileId() {

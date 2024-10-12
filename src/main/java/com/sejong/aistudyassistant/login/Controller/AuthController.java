@@ -42,7 +42,7 @@ public class AuthController {
     UserRepository userRepository;
     private final ProfileService profileService;
 
-    @PostMapping("/login")
+    @PostMapping("/study/login")
     public ResponseEntity<String> login(@RequestBody AuthRequestDto request) {
         String id = request.getId();
         String pw = request.getPw();

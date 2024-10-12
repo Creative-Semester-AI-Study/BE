@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/mypage")
+@RequestMapping("/study/myPage")
 public class MyPageController {
 
     @Autowired

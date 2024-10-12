@@ -6,6 +6,7 @@ import com.sejong.aistudyassistant.profile.Profile;
 import com.sejong.aistudyassistant.profile.ProfileRepository;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectRequest;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectResponse;
+import com.sejong.aistudyassistant.subject.dto.ModifySubjectRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -76,6 +77,34 @@ public class SubjectService {
             return true;  // 삭제 성공 시 true 반환
         } else {
             return false; // 해당 유저의 과목이 없으면 false 반환
+        }
+    }
+
+    // 특정 유저의 특정 과목 수정 (userId를 사용하여)
+    public ModifySubjectRequest modifySubject(Long userId, Long subjectId, Long profileId, Long textTransformId, Long summaryId, Long quizId, String subjectName) {
+        // userId로 profile 조회
+        Profile profile = profileRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Profile not found for userId: " + userId));
+
+        // profileId와 subjectId로 과목 조회
+        Subject modifySubject = subjectRepository.findByProfileIdAndSubjectId(profile.getProfileId(), subjectId);
+        if (modifySubject != null) {
+            // 과목 정보 수정
+            modifySubject.setSubjectName(subjectName);
+
+            // 수정된 과목 저장
+            subjectRepository.save(modifySubject);
+            return new ModifySubjectRequest(
+                    modifySubject.getSubjectId(),
+                    modifySubject.getProfileId(),
+                    modifySubject.getTextTransformId(),
+                    modifySubject.getSummaryId(),
+                    modifySubject.getQuizId(),
+                    modifySubject.getSubjectName()
+            );
+        }
+        else {
+            throw new RuntimeException("Subject not found for the provided subjectId.");
         }
     }
 }

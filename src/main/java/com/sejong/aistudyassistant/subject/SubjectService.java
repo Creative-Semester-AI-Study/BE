@@ -6,7 +6,9 @@ import com.sejong.aistudyassistant.profile.Profile;
 import com.sejong.aistudyassistant.profile.ProfileRepository;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectRequest;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectResponse;
-import com.sejong.aistudyassistant.subject.dto.ModifySubjectRequest;
+import com.sejong.aistudyassistant.subject.dto.ModifySubjectResponse;
+import jakarta.transaction.Transactional;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ public class SubjectService {
     @Autowired
     private ProfileRepository profileRepository;
 
+    @Transactional
     public CreateSubjectResponse createSubject(CreateSubjectRequest request) {
         Subject newSubject = new Subject();
 
@@ -65,6 +68,7 @@ public class SubjectService {
     }
 
     // 특정 유저의 특정 과목 삭제 (userId를 사용하여)
+    @Transactional
     public boolean deleteSubject(Long userId, Long subjectId) {
         // userId로 profile 조회
         Profile profile = profileRepository.findByUserId(userId)
@@ -81,7 +85,8 @@ public class SubjectService {
     }
 
     // 특정 유저의 특정 과목 수정 (userId를 사용하여)
-    public ModifySubjectRequest modifySubject(Long userId, Long subjectId, Long profileId, Long textTransformId, Long summaryId, Long quizId, String subjectName) {
+    @Transactional
+    public ModifySubjectResponse modifySubject(Long userId, Long subjectId, String modifySubjectName) {
         // userId로 profile 조회
         Profile profile = profileRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Profile not found for userId: " + userId));
@@ -90,11 +95,10 @@ public class SubjectService {
         Subject modifySubject = subjectRepository.findByProfileIdAndSubjectId(profile.getProfileId(), subjectId);
         if (modifySubject != null) {
             // 과목 정보 수정
-            modifySubject.setSubjectName(subjectName);
+            modifySubject.setSubjectName(modifySubjectName);
 
             // 수정된 과목 저장
-            subjectRepository.save(modifySubject);
-            return new ModifySubjectRequest(
+            return new ModifySubjectResponse(
                     modifySubject.getSubjectId(),
                     modifySubject.getProfileId(),
                     modifySubject.getTextTransformId(),
@@ -107,4 +111,5 @@ public class SubjectService {
             throw new RuntimeException("Subject not found for the provided subjectId.");
         }
     }
+
 }

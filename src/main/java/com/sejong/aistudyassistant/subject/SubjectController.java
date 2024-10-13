@@ -1,13 +1,9 @@
 package com.sejong.aistudyassistant.subject;
 
-import com.sejong.aistudyassistant.subject.dto.CreateSubjectRequest;
-import com.sejong.aistudyassistant.subject.dto.CreateSubjectResponse;
-import com.sejong.aistudyassistant.subject.dto.DeleteSubjectResponse;
-import com.sejong.aistudyassistant.subject.dto.ModifySubjectRequest;
+import com.sejong.aistudyassistant.subject.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.service.annotation.PutExchange;
 
 @RestController
 @RequestMapping("/study/myPage")
@@ -33,17 +29,12 @@ public class SubjectController {
     }
 
     // 특정 유저의 특정 과목 수정
-    @PutMapping("/{userId}")
-    public ResponseEntity<ModifySubjectRequest> modifySubject(
+    @PutMapping("/{userId}/{subjectId}")
+    public ResponseEntity<ModifySubjectResponse> modifySubject(
+            @RequestBody ModifySubjectRequest request,
             @PathVariable Long userId,
-            @PathVariable Long subjectId,
-            @PathVariable Long profileId,
-            @PathVariable Long textTransformId,
-            @PathVariable Long summaryId,
-            @PathVariable Long quizId,
-            @PathVariable String subjectName) {
-            ModifySubjectRequest response = subjectService.modifySubject(userId, subjectId, profileId, textTransformId, summaryId, quizId, subjectName);
-            return ResponseEntity.ok(response);
+            @PathVariable Long subjectId){
+        ModifySubjectResponse response = subjectService.modifySubject(userId, subjectId, request.getModifySubjectName());
+        return ResponseEntity.ok(response);
     }
-
 }

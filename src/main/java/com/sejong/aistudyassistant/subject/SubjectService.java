@@ -6,10 +6,15 @@ import com.sejong.aistudyassistant.profile.Profile;
 import com.sejong.aistudyassistant.profile.ProfileRepository;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectRequest;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectResponse;
+import com.sejong.aistudyassistant.subject.dto.MyPageSubjectSearchResponse;
+import com.sejong.aistudyassistant.text.Text;
+import com.sejong.aistudyassistant.text.TextRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SubjectService {
@@ -22,6 +27,10 @@ public class SubjectService {
 
     @Autowired
     private ProfileRepository profileRepository;
+
+    @Autowired
+    private TextRepository textRepository;
+
 
     public CreateSubjectResponse createSubject(CreateSubjectRequest request) {
         Subject newSubject = new Subject();
@@ -78,4 +87,22 @@ public class SubjectService {
             return false; // 해당 유저의 과목이 없으면 false 반환
         }
     }
+
+    public MyPageSubjectSearchResponse getTextsBySubjectId(Long subjectId) {
+        List<Text> texts = textRepository.findBySubjectId(subjectId);
+        MyPageSubjectSearchResponse response = new MyPageSubjectSearchResponse();
+        response.setTextTransforms(texts.stream().map(text -> {
+            TextResponse dto = new TextResponse();
+            dto.setTextId(text.getId()); // `Text` 엔티티의 ID 필드 사용
+            dto.setProfileId(text.getProfileId());
+            dto.setSubjectId(text.getSubjectId());
+            dto.setTextTitle(text.getTitle());
+            dto.setTextContent(text.getContent());
+            dto.setTextDate(text.getDate());
+            return dto;
+        }).collect(Collectors.toList()));
+        return response;
+    }
+
+
 }

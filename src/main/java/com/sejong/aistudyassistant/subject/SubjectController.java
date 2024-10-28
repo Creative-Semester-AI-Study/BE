@@ -3,6 +3,7 @@ package com.sejong.aistudyassistant.subject;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectRequest;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectResponse;
 import com.sejong.aistudyassistant.subject.dto.DeleteSubjectResponse;
+import com.sejong.aistudyassistant.subject.dto.MyPageSubjectSearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,4 +30,11 @@ public class SubjectController {
         boolean status = subjectService.deleteSubject(userId, subjectId);
         return ResponseEntity.ok(new DeleteSubjectResponse(status));
     }
+
+    @GetMapping("/{subjectId}")
+    public ResponseEntity<MyPageSubjectSearchResponse> getTextsBySubjectId(@PathVariable Long subjectId) {
+        MyPageSubjectSearchResponse response = subjectService.getTextsBySubjectId(subjectId);
+        return ResponseEntity.ok(response);
+    }
+
 }

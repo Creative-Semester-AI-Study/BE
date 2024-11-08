@@ -20,8 +20,6 @@ import com.sejong.aistudyassistant.login.Entity.User;
 import com.sejong.aistudyassistant.login.Repository.UserRepository;
 import com.sejong.aistudyassistant.login.RequestDto.AuthRequestDto;
 import com.sejong.aistudyassistant.login.Service.UserService;
-//import sejong_team.matching.SejongProfile.Entity.Profile;
-//import sejong_team.matching.SejongProfile.Repository.ProfileRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,7 +74,6 @@ public class AuthController {
                         // User 저장
                         userService.saveUserFromJsonResponse(responseBody, userId);
                         log.info("User created: {}", findUser);
-
                         // Profile 생성 (User가 저장된 이후에 실행)
                        // profileService.createProfile(findUser);
                     }

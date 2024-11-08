@@ -32,9 +32,8 @@ public class AuthController {
     private final RestTemplate restTemplate;
     private final UserService userService;
     private final ObjectMapper mapper;
-
-    @Autowired
     ProfileRepository profileRepository;
+    private final JwtUtil jwtUtil;
 
     @Autowired
     UserRepository userRepository;
@@ -75,11 +74,11 @@ public class AuthController {
                         userService.saveUserFromJsonResponse(responseBody, userId);
                         log.info("User created: {}", findUser);
                         // Profile 생성 (User가 저장된 이후에 실행)
-                       // profileService.createProfile(findUser);
+                       profileService.createProfile(findUser);
                     }
 
                     // JWT 토큰 생성
-                    String token = JwtUtil.generateToken(userId);
+                    String token = jwtUtil.generateToken(userId);
                     log.info("Generated Token: {}", token);
 
                     // User 엔티티의 정보와 함께 JSON 응답 생성

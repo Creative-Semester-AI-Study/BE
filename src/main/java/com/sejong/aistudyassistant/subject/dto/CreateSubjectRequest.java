@@ -1,5 +1,9 @@
 package com.sejong.aistudyassistant.subject.dto;
 
+import jakarta.persistence.Column;
+
+import java.time.LocalTime;
+
 public class CreateSubjectRequest {
     private Long subjectId;
     private Long profileId;
@@ -7,14 +11,14 @@ public class CreateSubjectRequest {
     private Long summaryId;
     private Long quizId;
     private String subjectName;
+    private String professorName;
+    private String days;
+    private LocalTime startTime;
+    private LocalTime endTime;
 
-    // Getters and Setters
+    // Getters
     public Long getSubjectId() {
         return subjectId;
-    }
-
-    public void setSubjectId(Long subjectId) {
-        this.subjectId = subjectId;
     }
 
     public Long getProfileId() {
@@ -29,31 +33,31 @@ public class CreateSubjectRequest {
         return textTransformId;
     }
 
-    public void setTextTransformId(Long textTransformId) {
-        this.textTransformId = textTransformId;
-    }
-
     public Long getSummaryId() {
         return summaryId;
-    }
-
-    public void setSummaryId(Long summaryId) {
-        this.summaryId = summaryId;
     }
 
     public Long getQuizId() {
         return quizId;
     }
 
-    public void setQuizId(Long quizId) {
-        this.quizId = quizId;
-    }
-
     public String getSubjectName() {
         return subjectName;
     }
 
-    public void setSubjectName(String subjectName) {
-        this.subjectName = subjectName;
+    public String getProfessorName() {
+        return professorName;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public String getDays() {
+        return days;
     }
 }

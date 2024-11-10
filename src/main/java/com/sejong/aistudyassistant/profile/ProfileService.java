@@ -59,8 +59,7 @@ public class ProfileService {
                         profile.getProfileId(),
                         profile.getUserId(),
                         profile.getStudentId(),
-                        profile.getStudentName(),
-                        profile.getProfileImage()
+                        profile.getStudentName()
                 ));
     }
 }

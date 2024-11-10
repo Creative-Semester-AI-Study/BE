@@ -5,15 +5,13 @@ public class ProfileResponse {
     private Long userId;
     private Long studentId;
     private String studentName;
-    private byte[] profileImage;
 
     // 생성자
-    public ProfileResponse(Long profileId, Long userId, Long studentId, String studentName, byte[] profileImage) {
+    public ProfileResponse(Long profileId, Long userId, Long studentId, String studentName) {
         this.profileId = profileId;
         this.userId = userId;
         this.studentId = studentId;
         this.studentName = studentName;
-        this.profileImage = profileImage;
     }
 
     // Getter 메소드
@@ -31,9 +29,5 @@ public class ProfileResponse {
 
     public String getStudentName() {
         return studentName;
-    }
-
-    public byte[] getProfileImage() {
-        return profileImage;
     }
 }

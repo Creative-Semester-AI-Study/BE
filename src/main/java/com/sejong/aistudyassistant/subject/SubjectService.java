@@ -6,6 +6,7 @@ import com.sejong.aistudyassistant.profile.Profile;
 import com.sejong.aistudyassistant.profile.ProfileRepository;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectRequest;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectResponse;
+
 import com.sejong.aistudyassistant.subject.dto.ModifySubjectResponse;
 import jakarta.persistence.Column;
 import jakarta.transaction.Transactional;
@@ -14,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SubjectService {
@@ -29,6 +32,7 @@ public class SubjectService {
     private ProfileRepository profileRepository;
 
     @Transactional
+
     public CreateSubjectResponse createSubject(CreateSubjectRequest request) {
         Subject newSubject = new Subject();
 
@@ -125,5 +129,4 @@ public class SubjectService {
             throw new RuntimeException("Subject not found for the provided subjectId.");
         }
     }
-
 }

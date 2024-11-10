@@ -6,6 +6,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 
+import java.time.LocalTime;
+
 @Entity
 public class Subject {
 
@@ -27,6 +29,18 @@ public class Subject {
 
     @Column(nullable = false, length = 100)
     private String subjectName;
+
+    @Column(nullable = false, length = 100)
+    private String professorName;
+
+    @Column(nullable = false, length = 100)
+    private String days;
+
+    @Column(nullable = false, length = 20)
+    private LocalTime startTime;
+
+    @Column(nullable = false, length = 20)
+    private LocalTime endTime;
 
     // Getters and Setters
     public Long getSubjectId() {
@@ -75,5 +89,37 @@ public class Subject {
 
     public void setSubjectName(String subjectName) {
         this.subjectName = subjectName;
+    }
+
+    public String getProfessorName() {
+        return professorName;
+    }
+
+    public void setProfessorName(String professorName) {
+        this.professorName = professorName;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getDays() {
+        return days;
+    }
+
+    public void setDays(String days) {
+        this.days = days;
     }
 }

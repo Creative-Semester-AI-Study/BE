@@ -3,7 +3,7 @@ package com.sejong.aistudyassistant.login.Controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sejong.aistudyassistant.profile.Profile;
+import com.sejong.aistudyassistant.jwt.JwtUtil;
 import com.sejong.aistudyassistant.profile.ProfileRepository;
 import com.sejong.aistudyassistant.profile.ProfileService;
 import com.sejong.aistudyassistant.profile.dto.ProfileResponse;
@@ -20,8 +20,6 @@ import com.sejong.aistudyassistant.login.Entity.User;
 import com.sejong.aistudyassistant.login.Repository.UserRepository;
 import com.sejong.aistudyassistant.login.RequestDto.AuthRequestDto;
 import com.sejong.aistudyassistant.login.Service.UserService;
-//import sejong_team.matching.SejongProfile.Entity.Profile;
-//import sejong_team.matching.SejongProfile.Repository.ProfileRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,9 +32,8 @@ public class AuthController {
     private final RestTemplate restTemplate;
     private final UserService userService;
     private final ObjectMapper mapper;
-
-    @Autowired
     ProfileRepository profileRepository;
+    private final JwtUtil jwtUtil;
 
     @Autowired
     UserRepository userRepository;
@@ -75,15 +72,18 @@ public class AuthController {
                     } else {
                         // User 저장
                         userService.saveUserFromJsonResponse(responseBody, userId);
-                        findUser = userService.findUser(userId);
                         log.info("User created: {}", findUser);
-
                         // Profile 생성 (User가 저장된 이후에 실행)
-                        profileService.createProfile(findUser);
+                       profileService.createProfile(findUser);
                     }
+
+                    // JWT 토큰 생성
+                    String token = jwtUtil.generateToken(userId);
+                    log.info("Generated Token: {}", token);
 
                     // User 엔티티의 정보와 함께 JSON 응답 생성
                     Map<String, Object> userInfoMap = new HashMap<>();
+                    userInfoMap.put("token", token); // 토큰 추가
                     userInfoMap.put("id", findUser.getId());
                     userInfoMap.put("name", name);
                     userInfoMap.put("department", department);

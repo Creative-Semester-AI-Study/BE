@@ -33,9 +33,6 @@ public class SubjectService {
         Subject newSubject = new Subject();
 
         newSubject.setProfileId(request.getProfileId());
-        newSubject.setTextTransformId(request.getTextTransformId());
-        newSubject.setSummaryId(request.getSummaryId());
-        newSubject.setQuizId(request.getQuizId());
         newSubject.setSubjectName(request.getSubjectName());
         newSubject.setProfessorName(request.getProfessorName());
         newSubject.setDays(request.getDays());
@@ -52,23 +49,20 @@ public class SubjectService {
 
             // 마이페이지가 존재하고, 해당 마이페이지의 subjectId가 null인 경우에만 업데이트
             if (myPage.getSubjectId() == null) {
-                myPage.setSubjectId(savedSubject.getSubjectId());  // SubjectId 추가
+                myPage.setSubjectId(savedSubject.getId());  // SubjectId 추가
                 myPageRepository.save(myPage);
             }
         } else {
             // 마이페이지가 없거나, subjectId가 null이 아닌 경우 새로운 마이페이지 생성
             MyPage newMyPage = new MyPage();
             newMyPage.setProfileId(savedSubject.getProfileId());  // profileId 설정
-            newMyPage.setSubjectId(savedSubject.getSubjectId());
+            newMyPage.setSubjectId(savedSubject.getId());
             myPageRepository.save(newMyPage);
         }
 
         return new CreateSubjectResponse(
-                savedSubject.getSubjectId(),
+                savedSubject.getId(),
                 savedSubject.getProfileId(),
-                savedSubject.getTextTransformId(),
-                savedSubject.getSummaryId(),
-                savedSubject.getQuizId(),
                 savedSubject.getSubjectName(),
                 savedSubject.getProfessorName(),
                 savedSubject.getDays(),
@@ -79,13 +73,13 @@ public class SubjectService {
 
     // 특정 유저의 특정 과목 삭제 (userId를 사용하여)
     @Transactional
-    public boolean deleteSubject(Long userId, Long subjectId) {
+    public boolean deleteSubject(Long userId, Long id) {
         // userId로 profile 조회
         Profile profile = profileRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Profile not found for userId: " + userId));
 
         // profileId와 subjectId로 과목 조회 및 삭제
-        Subject subject = subjectRepository.findByProfileIdAndSubjectId(profile.getProfileId(), subjectId);
+        Subject subject = subjectRepository.findByProfileIdAndId(profile.getProfileId(), id);
         if (subject != null) {
             subjectRepository.delete(subject);
             return true;  // 삭제 성공 시 true 반환
@@ -96,24 +90,21 @@ public class SubjectService {
 
     // 특정 유저의 특정 과목 수정 (userId를 사용하여)
     @Transactional
-    public ModifySubjectResponse modifySubject(Long userId, Long subjectId, String modifySubjectName) {
+    public ModifySubjectResponse modifySubject(Long userId, Long id, String modifySubjectName) {
         // userId로 profile 조회
         Profile profile = profileRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Profile not found for userId: " + userId));
 
         // profileId와 subjectId로 과목 조회
-        Subject modifySubject = subjectRepository.findByProfileIdAndSubjectId(profile.getProfileId(), subjectId);
+        Subject modifySubject = subjectRepository.findByProfileIdAndId(profile.getProfileId(), id);
         if (modifySubject != null) {
             // 과목 정보 수정
             modifySubject.setSubjectName(modifySubjectName);
 
             // 수정된 과목 저장
             return new ModifySubjectResponse(
-                    modifySubject.getSubjectId(),
+                    modifySubject.getId(),
                     modifySubject.getProfileId(),
-                    modifySubject.getTextTransformId(),
-                    modifySubject.getSummaryId(),
-                    modifySubject.getQuizId(),
                     modifySubject.getSubjectName(),
                     modifySubject.getProfessorName(),
                     modifySubject.getDays(),

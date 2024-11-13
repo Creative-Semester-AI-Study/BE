@@ -11,21 +11,20 @@ import java.time.LocalTime;
 @Entity
 public class Subject {
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long subjectId;
+    private Long id;
 
     @Column(nullable = false)
     private Long profileId;
-
-    @Column(nullable = false)
-    private Long textTransformId;
-
-    @Column(nullable = false)
-    private Long summaryId;
-
-    @Column(nullable = false)
-    private Long quizId;
 
     @Column(nullable = false, length = 100)
     private String subjectName;
@@ -43,13 +42,6 @@ public class Subject {
     private LocalTime endTime;
 
     // Getters and Setters
-    public Long getSubjectId() {
-        return subjectId;
-    }
-
-    public void setSubjectId(Long subjectId) {
-        this.subjectId = subjectId;
-    }
 
     public Long getProfileId() {
         return profileId;
@@ -57,30 +49,6 @@ public class Subject {
 
     public void setProfileId(Long profileId) {
         this.profileId = profileId;
-    }
-
-    public Long getTextTransformId() {
-        return textTransformId;
-    }
-
-    public void setTextTransformId(Long textTransformId) {
-        this.textTransformId = textTransformId;
-    }
-
-    public Long getSummaryId() {
-        return summaryId;
-    }
-
-    public void setSummaryId(Long summaryId) {
-        this.summaryId = summaryId;
-    }
-
-    public Long getQuizId() {
-        return quizId;
-    }
-
-    public void setQuizId(Long quizId) {
-        this.quizId = quizId;
     }
 
     public String getSubjectName() {

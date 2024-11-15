@@ -20,8 +20,7 @@ public class QuizOption {
 
     @ManyToOne
     @JoinColumn(name = "quiz_id")
-    private Quiz quiz;  // Quiz와의 연관 관계 설정
+    private Quiz quiz;
 
-    private String optionText;  // 선택지 텍스트
-
+    private String optionText;
 }

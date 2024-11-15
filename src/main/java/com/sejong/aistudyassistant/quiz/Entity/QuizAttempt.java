@@ -15,20 +15,20 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class QuizAttempt { //퀴즈 하나에 대한 정답 여부 저장
+public class QuizAttempt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long quizAttemptId;
 
-    private Long quizId;  // 퀴즈 식별자 (Quiz 테이블과 연결)
+    private Long quizId;
 
-    private Long userId;  // 사용자 식별자
+    private Long userId;
 
-    private Long summaryId; //요약문
+    private Long summaryId;
 
-    private String attemptDate;  // 시도 날짜
+    private String attemptDate;
 
-    private Boolean correct=false; //답이 맞았는지 안 맞았는지
+    private Boolean correct=false;
 
 }

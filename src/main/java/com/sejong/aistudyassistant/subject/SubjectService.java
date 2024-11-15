@@ -7,11 +7,13 @@ import com.sejong.aistudyassistant.profile.ProfileRepository;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectRequest;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectResponse;
 import com.sejong.aistudyassistant.subject.dto.ModifySubjectResponse;
+import jakarta.persistence.Column;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.Optional;
 
 @Service
@@ -35,6 +37,10 @@ public class SubjectService {
         newSubject.setSummaryId(request.getSummaryId());
         newSubject.setQuizId(request.getQuizId());
         newSubject.setSubjectName(request.getSubjectName());
+        newSubject.setProfessorName(request.getProfessorName());
+        newSubject.setDays(request.getDays());
+        newSubject.setStartTime(request.getStartTime());
+        newSubject.setEndTime(request.getEndTime());
 
         Subject savedSubject = subjectRepository.save(newSubject);
 
@@ -63,7 +69,11 @@ public class SubjectService {
                 savedSubject.getTextTransformId(),
                 savedSubject.getSummaryId(),
                 savedSubject.getQuizId(),
-                savedSubject.getSubjectName()
+                savedSubject.getSubjectName(),
+                savedSubject.getProfessorName(),
+                savedSubject.getDays(),
+                savedSubject.getStartTime(),
+                savedSubject.getEndTime()
         );
     }
 
@@ -104,7 +114,11 @@ public class SubjectService {
                     modifySubject.getTextTransformId(),
                     modifySubject.getSummaryId(),
                     modifySubject.getQuizId(),
-                    modifySubject.getSubjectName()
+                    modifySubject.getSubjectName(),
+                    modifySubject.getProfessorName(),
+                    modifySubject.getDays(),
+                    modifySubject.getStartTime(),
+                    modifySubject.getEndTime()
             );
         }
         else {

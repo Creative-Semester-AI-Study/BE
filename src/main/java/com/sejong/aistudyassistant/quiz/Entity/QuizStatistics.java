@@ -14,14 +14,19 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class QuizStatistics { //하나의 요약문에 대한 통계치
+public class QuizStatistics {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long quizStatisticsId;
-    private Long userId;    //유저
-    private Long summaryId; //요약문
-    private Long subjectId; //과목
-    private int totalQuestions=20;  // 총 문제 수(각 요약문마다 20개 이므로 20으로 전부 설정)
-    private int correctAnswers=0;  // 맞힌 문제 수
+
+    private Long userId;
+
+    private Long summaryId;
+
+    private Long subjectId;
+
+    private int totalQuestions=20;
+
+    private int correctAnswers=0;
 }

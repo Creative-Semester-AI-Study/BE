@@ -5,9 +5,6 @@ import java.time.LocalTime;
 public class CreateSubjectResponse {
     private Long subjectId;
     private Long profileId;
-    private Long textTransformId;
-    private Long summaryId;
-    private Long quizId;
     private String subjectName;
     private String professorName;
     private String days;
@@ -15,14 +12,10 @@ public class CreateSubjectResponse {
     private LocalTime endTime;
 
     // Constructor
-    public CreateSubjectResponse(Long subjectId, Long profileId, Long textTransformId,
-                                 Long summaryId, Long quizId, String subjectName,
+    public CreateSubjectResponse(Long subjectId, Long profileId, String subjectName,
                                  String professorName, String days, LocalTime startTime, LocalTime endTime) {
         this.subjectId = subjectId;
         this.profileId = profileId;
-        this.textTransformId = textTransformId;
-        this.summaryId = summaryId;
-        this.quizId = quizId;
         this.subjectName = subjectName;
         this.professorName = professorName;
         this.days =days;
@@ -37,18 +30,6 @@ public class CreateSubjectResponse {
 
     public Long getSubjectId() {
         return subjectId;
-    }
-
-    public Long getTextTransformId() {
-        return textTransformId;
-    }
-
-    public Long getSummaryId() {
-        return summaryId;
-    }
-
-    public Long getQuizId() {
-        return quizId;
     }
 
     public String getSubjectName() {

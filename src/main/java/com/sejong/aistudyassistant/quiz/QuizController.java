@@ -73,12 +73,12 @@ public class QuizController {
     }
 
     @GetMapping("/learning/result")
-    public ResponseEntity<GetLearningResultResponse> getLearningResult(@RequestHeader("Authorization") String authHeader,@RequestBody GetLearningQuizRequest quizRequest) {
+    public ResponseEntity<GetLearningResultResponse> getLearningResult(@RequestHeader("Authorization") String authHeader,@RequestBody GetLearningResultRequest quizRequest) {
 
         String token = authHeader.replace("Bearer ", "");
         Long userId=jwtUtil.getUserIdFromToken(token);
         try {
-            return ResponseEntity.ok(quizService.getLearningResult(userId, quizRequest.summaryId()));
+            return ResponseEntity.ok(quizService.getLearningResult(userId, quizRequest.summaryId(),quizRequest.subjectId()));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }

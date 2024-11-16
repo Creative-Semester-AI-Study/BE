@@ -1,11 +1,18 @@
 package com.sejong.aistudyassistant.mypage;
 
+import com.sejong.aistudyassistant.jwt.JwtUtil;
+import com.sejong.aistudyassistant.stt.TranscriptDTO;
+import com.sejong.aistudyassistant.stt.TranscriptionService;
 import com.sejong.aistudyassistant.subject.dto.DeleteSubjectResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -15,28 +22,30 @@ public class MyPageController {
     @Autowired
     private MyPageService myPageService;
 
-    // userId로 마이페이지 조회
-    @GetMapping("/{userId}")
-    public ResponseEntity<MyPageResponse> getMyPageByUserId(@PathVariable Long userId) {
-        return myPageService.getMyPageByUserId(userId)
-                .map(myPage -> {
-                    MyPageResponse response = new MyPageResponse(
-                            myPage.getMyPageId(),
-                            myPage.getProfileId(),
-                            myPage.getSubjectId()
-                    );
-                    return ResponseEntity.ok(response);
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    private final JwtUtil jwtUtil;
+
+    MyPageController(MyPageService myPageService, JwtUtil jwtUtil) {
+        this.myPageService = myPageService;
+        this.jwtUtil = jwtUtil;
     }
 
-//    // userId로 마이페이지에서 과목 삭제
-//    @DeleteMapping("/{userId}")
-//    public ResponseEntity<DeleteSubjectResponse> deleteSubjectFromMyPage(@PathVariable Long userId) {
-//        boolean status = myPageService.deleteSubjectByUserId(userId);
-//        return ResponseEntity.ok(new DeleteSubjectResponse(status));
-//    }
+    @GetMapping("/transcripts/{subjectId}")
+    public ResponseEntity<List<TranscriptDTO>> getTranscriptsBySubjectId(
+            @PathVariable Long subjectId,
+            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        List<TranscriptDTO> transcripts = myPageService.getTranscriptsByUserIdAndSubjectId(userId, subjectId);
+        return ResponseEntity.ok(transcripts);
+    }
 
+    @GetMapping("/transcripts/date/{date}")
+    public ResponseEntity<List<TranscriptDTO>> getTranscriptsByDate(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        List<TranscriptDTO> transcripts = myPageService.getTranscriptsByUserIdAndDate(userId, date);
+        return ResponseEntity.ok(transcripts);
+    }
 }
-
-

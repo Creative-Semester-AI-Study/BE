@@ -1,7 +1,7 @@
 package com.sejong.aistudyassistant.stt;
 
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.sejong.aistudyassistant.subject.Subject;
+import com.sejong.aistudyassistant.subject.SubjectRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -12,28 +12,24 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-/*
+
 @Service
 public class TranscriptionService {
     private final TranscriptRepository transcriptRepository;
-    private final String apiToken;
+
+    private final SubjectRepository subjectRepository;
     private final WebClient webClient;
 
     public TranscriptionService(
             TranscriptRepository transcriptRepository,
+            SubjectRepository subjectRepository,
             @Value("${daglo.api.token}") String apiToken) {
         this.transcriptRepository = transcriptRepository;
-        this.apiToken = apiToken;
+        this.subjectRepository = subjectRepository;
         this.webClient = WebClient.builder()
                 .baseUrl("https://apis.daglo.ai")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiToken)
                 .build();
-    }
-
-    @PostConstruct
-    public void init() {
-        System.out.println("API Token (first 5 chars): " +
-                (apiToken != null ? apiToken.substring(0, Math.min(apiToken.length(), 5)) : "null"));
     }
 
     public Mono<String> transcribeAudio(String audioUrl) {
@@ -66,12 +62,42 @@ public class TranscriptionService {
                 });
     }
 
-    public Transcript saveTranscript(String audioFileName, String transcriptText) {
+    public Transcript saveTranscript(Long subjectId, Long userId, String audioFileName, String transcriptText) {
+        Subject subject = subjectRepository.findById(subjectId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid subject ID: " + subjectId));
+
         Transcript transcript = new Transcript();
+        transcript.setSubject(subject);
+        transcript.setUserId(userId);
         transcript.setAudioFileName(audioFileName);
         transcript.setTranscriptText(transcriptText);
         transcript.setCreatedAt(LocalDateTime.now());
+
         return transcriptRepository.save(transcript);
     }
+
+    public TranscriptDTO getTranscriptById(Long transcriptId, Long userId) {
+        Transcript transcript = transcriptRepository.findById(transcriptId)
+                .orElseThrow(() -> new RuntimeException("Transcript not found with id: " + transcriptId));
+
+        // 보안을 위해 요청한 사용자의 userId와 transcript의 userId가 일치하는지 확인
+        if (!transcript.getUserId().equals(userId)) {
+            throw new RuntimeException("Unauthorized access to transcript");
+        }
+
+        return convertToDTO(transcript);
+    }
+
+    private TranscriptDTO convertToDTO(Transcript transcript) {
+        return new TranscriptDTO(
+                transcript.getId(),
+                transcript.getSubject().getId(),
+                transcript.getAudioFileName(),
+                transcript.getTranscriptText(),
+                transcript.getCreatedAt(),
+                transcript.getUserId(),
+                transcript.getSummaryId(),
+                transcript.getQuizId()
+        );
+    }
 }
-*/

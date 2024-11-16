@@ -5,7 +5,6 @@ import com.sejong.aistudyassistant.profile.ProfileRepository;
 import com.sejong.aistudyassistant.quiz.Entity.Quiz;
 import com.sejong.aistudyassistant.quiz.Entity.QuizAttempt;
 import com.sejong.aistudyassistant.quiz.Entity.QuizOption;
-import com.sejong.aistudyassistant.quiz.Entity.QuizStatistics;
 import com.sejong.aistudyassistant.quiz.Repository.QuizAttemptRepository;
 import com.sejong.aistudyassistant.quiz.Repository.QuizOptionRepository;
 import com.sejong.aistudyassistant.quiz.Repository.QuizRepository;
@@ -199,7 +198,7 @@ public class QuizService {
         return quizResponse;
     }
 
-    public GetLearningResultResponse getLearningResult(Long userId, Long summaryId){
+    public GetLearningResultResponse getLearningResult(Long userId, Long summaryId,Long subjectId){
 
         List<QuizAttempt> quizList=quizAttemptRepository.findByUserIdAndSummaryIdAndQuizIdBetween(userId,summaryId,1L,5L);
         int correctAnswers=0;
@@ -208,10 +207,10 @@ public class QuizService {
             correctAnswers=correctAnswers+(quiz.getCorrect()? 1:0);
         }
 
-        Subject subject=subjectRepository.findBySummaryId(summaryId);
+        Optional<Subject> subject=subjectRepository.findById(subjectId);
         QuizAttempt quizAttempt=quizAttemptRepository.findByQuizId(1L);
 
-        GetLearningResultResponse resultResponse=new GetLearningResultResponse(userId, summaryId,quizAttempt.getAttemptDate(),subject.getSubjectName(),5,correctAnswers);
+        GetLearningResultResponse resultResponse=new GetLearningResultResponse(userId, summaryId,quizAttempt.getAttemptDate(),subject.get().getSubjectName(),5,correctAnswers);
         return resultResponse;
     }
 

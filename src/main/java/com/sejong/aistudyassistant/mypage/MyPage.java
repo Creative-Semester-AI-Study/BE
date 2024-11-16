@@ -2,28 +2,17 @@ package com.sejong.aistudyassistant.mypage;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class MyPage {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long myPageId;
+    private Long id;
 
-    // profileId를 직접 저장
-    @Column(nullable = false)
-    private Long profileId;
+    private LocalDateTime createdAt;
 
-    // 기타 필드들...
     private Long subjectId;
-
-    // Getters and Setters
-    public Long getMyPageId() {
-        return myPageId;
-    }
-
-    public void setMyPageId(Long myPageId) {
-        this.myPageId = myPageId;
-    }
 
     public Long getProfileId() {
         return profileId;
@@ -31,6 +20,28 @@ public class MyPage {
 
     public void setProfileId(Long profileId) {
         this.profileId = profileId;
+    }
+
+    private Long profileId;
+
+
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Long getSubjectId() {

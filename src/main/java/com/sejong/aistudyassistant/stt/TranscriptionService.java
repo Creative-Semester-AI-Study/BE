@@ -77,4 +77,28 @@ public class TranscriptionService {
         return transcriptRepository.save(transcript);
     }
 
+    public TranscriptDTO getTranscriptById(Long transcriptId, Long userId) {
+        Transcript transcript = transcriptRepository.findById(transcriptId)
+                .orElseThrow(() -> new RuntimeException("Transcript not found with id: " + transcriptId));
+
+        // 보안을 위해 요청한 사용자의 userId와 transcript의 userId가 일치하는지 확인
+        if (!transcript.getUserId().equals(userId)) {
+            throw new RuntimeException("Unauthorized access to transcript");
+        }
+
+        return convertToDTO(transcript);
+    }
+
+    private TranscriptDTO convertToDTO(Transcript transcript) {
+        return new TranscriptDTO(
+                transcript.getId(),
+                transcript.getSubject().getId(),
+                transcript.getAudioFileName(),
+                transcript.getTranscriptText(),
+                transcript.getCreatedAt(),
+                transcript.getUserId(),
+                transcript.getSummaryId(),
+                transcript.getQuizId()
+        );
+    }
 }

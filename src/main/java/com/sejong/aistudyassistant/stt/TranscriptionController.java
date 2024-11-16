@@ -1,6 +1,7 @@
 package com.sejong.aistudyassistant.stt;
 
 import com.sejong.aistudyassistant.jwt.JwtUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -33,5 +34,20 @@ public class TranscriptionController {
         return transcriptionService.transcribeAudio(audioUrl)
                 .map(transcriptText -> transcriptionService.saveTranscript(subjectId, userId, audioFileName, transcriptText))
                 .map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/{transcriptId}")
+    public ResponseEntity<TranscriptDTO> getTranscriptById(
+            @PathVariable Long transcriptId,
+            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+
+        try {
+            TranscriptDTO transcript = transcriptionService.getTranscriptById(transcriptId, userId);
+            return ResponseEntity.ok(transcript);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 }

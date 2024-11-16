@@ -13,4 +13,6 @@ public interface MyPageRepository extends JpaRepository<MyPage,Long> {
 
     // profileId로 MyPage 조회
     Optional<MyPage> findByProfileId(Long profileId);
+    Optional<MyPage> findBySubjectId(Long subjectId);
+
 }

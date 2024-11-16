@@ -1,15 +1,28 @@
 package com.sejong.aistudyassistant.mypage;
 
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDateTime;
+
 public class MyPageResponse {
 
     private Long myPageId;
-    private Long profileId;
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    private LocalDateTime createdAt;
     private Long subjectId;
 
     // 생성자
-    public MyPageResponse(Long myPageId, Long profileId, Long subjectId) {
+    public MyPageResponse(Long myPageId, LocalDateTime createdAt, Long subjectId) {
         this.myPageId = myPageId;
-        this.profileId = profileId;
+        this.createdAt = createdAt;
         this.subjectId = subjectId;
     }
 
@@ -22,13 +35,6 @@ public class MyPageResponse {
         this.myPageId = myPageId;
     }
 
-    public Long getProfileId() {
-        return profileId;
-    }
-
-    public void setProfileId(Long profileId) {
-        this.profileId = profileId;
-    }
 
     public Long getSubjectId() {
         return subjectId;

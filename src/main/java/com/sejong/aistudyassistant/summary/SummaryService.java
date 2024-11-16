@@ -89,4 +89,9 @@ public class SummaryService {
                     }
                 });
     }
+
+    public Summary getSummaryById(Long summaryId) {
+        return summaryRepository.findById(summaryId)
+                .orElseThrow(() -> new RuntimeException("Summary not found with id: " + summaryId));
+    }
 }

@@ -2,7 +2,6 @@ package com.sejong.aistudyassistant.stt;
 
 import com.sejong.aistudyassistant.subject.Subject;
 import com.sejong.aistudyassistant.subject.SubjectRepository;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;

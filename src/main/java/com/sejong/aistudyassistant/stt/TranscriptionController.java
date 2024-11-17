@@ -1,5 +1,6 @@
 package com.sejong.aistudyassistant.stt;
 
+
 import com.sejong.aistudyassistant.jwt.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/transcription")
@@ -51,3 +53,4 @@ public class TranscriptionController {
         }
     }
 }
+

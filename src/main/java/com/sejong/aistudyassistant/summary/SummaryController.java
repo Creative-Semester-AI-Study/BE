@@ -2,10 +2,7 @@ package com.sejong.aistudyassistant.summary;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -23,6 +20,12 @@ public class SummaryController {
     public Mono<ResponseEntity<SummaryResponseDto>> createSummary(@RequestBody Map<String, Long> request) {
         Long transcriptId = request.get("transcriptId");
         return summaryService.createSummary(transcriptId)
-                .map(summary -> ResponseEntity.ok(new SummaryResponseDto(summary.getSummaryText(), summary.getTranscriptId())));
+                .map(summary -> ResponseEntity.ok(new SummaryResponseDto(summary.getId(), summary.getSummaryText(), summary.getTranscriptId())));
+    }
+
+    @GetMapping("/{summaryId}")
+    public ResponseEntity<SummaryResponseDto> getSummaryById(@PathVariable Long summaryId) {
+        Summary summary = summaryService.getSummaryById(summaryId);
+        return ResponseEntity.ok(new SummaryResponseDto(summary.getId(), summary.getSummaryText(), summary.getTranscriptId()));
     }
 }

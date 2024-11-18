@@ -1,39 +1,60 @@
 package com.sejong.aistudyassistant.mypage;
 
 import com.sejong.aistudyassistant.profile.ProfileRepository;
+import com.sejong.aistudyassistant.stt.Transcript;
+import com.sejong.aistudyassistant.stt.TranscriptDTO;
+import com.sejong.aistudyassistant.stt.TranscriptRepository;
+import com.sejong.aistudyassistant.subject.Subject;
+import com.sejong.aistudyassistant.subject.SubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MyPageService {
 
     @Autowired
-    private MyPageRepository myPageRepository;
-
+    private TranscriptRepository transcriptRepository;
     @Autowired
-    private ProfileRepository profileRepository; // ProfileRepository 추가
+    private SubjectRepository subjectRepository;
 
-    // MyPage 정보 조회 (userId로)
-    public Optional<MyPage> getMyPageByUserId(Long userId) {
-        // userId로 profile을 먼저 조회한 후 profileId로 MyPage 조회
-        return profileRepository.findByUserId(userId)
-                .flatMap(profile -> myPageRepository.findByProfileId(profile.getProfileId()));
+    public List<TranscriptDTO> getTranscriptsByUserIdAndSubjectId(Long userId, Long subjectId) {
+        // 먼저 해당 userId와 subjectId가 일치하는 Subject가 있는지 확인
+        Subject subject = subjectRepository.findByUserIdAndId(userId, subjectId)
+                .orElseThrow(() -> new RuntimeException("Subject not found for this user"));
+
+        List<Transcript> transcripts = transcriptRepository.findBySubject_Id(subjectId);
+        return transcripts.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-//    // MyPage에서 과목 삭제 (subjectId를 null로 설정)
-//    public boolean deleteSubjectByUserId(Long userId) {
-//        // 먼저 userId로 profile을 조회한 후 profileId로 MyPage 조회
-//        Optional<MyPage> myPageOptional = getMyPageByUserId(userId);
-//
-//        if (myPageOptional.isPresent()) {
-//            MyPage myPage = myPageOptional.get();
-//            myPage.setSubjectId(null);  // subjectId를 null로 설정하여 과목 삭제
-//            myPageRepository.save(myPage);
-//            return true;  // 삭제 성공 시 true 반환
-//        } else {
-//            return false; // 해당하는 MyPage가 없을 경우 false 반환
-//        }
-//    }
+    public List<TranscriptDTO> getTranscriptsByUserIdAndDate(Long userId, LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+        List<Transcript> transcripts = transcriptRepository.findByUserIdAndCreatedAtBetween(userId, startOfDay, endOfDay);
+        return transcripts.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    private TranscriptDTO convertToDTO(Transcript transcript) {
+        return new TranscriptDTO(
+                transcript.getId(),
+                transcript.getSubject().getId(),
+                transcript.getAudioFileName(),
+                transcript.getTranscriptText(),
+                transcript.getCreatedAt(),
+                transcript.getUserId(),
+                transcript.getSummaryId(),
+                transcript.getQuizId()
+        );
+    }
 }

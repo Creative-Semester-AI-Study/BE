@@ -11,9 +11,15 @@ public class ModifySubjectResponse{
     private LocalTime startTime;
     private LocalTime endTime;
 
+    private Long userId;
+
+    public Long getUserId() {
+        return userId;
+    }
+
     // Constructor
     public ModifySubjectResponse(Long subjectId, Long profileId, String subjectName,
-                                 String professorName, String days, LocalTime startTime, LocalTime endTime) {
+                                 String professorName, String days, LocalTime startTime, LocalTime endTime, Long userId) {
         this.subjectId = subjectId;
         this.profileId = profileId;
         this.subjectName = subjectName;
@@ -21,6 +27,7 @@ public class ModifySubjectResponse{
         this.days = days;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.userId=userId;
     }
 
     // Getters

@@ -7,16 +7,15 @@ import java.time.LocalTime;
 public class CreateSubjectRequest {
     private Long subjectId;
     private Long profileId;
-    private Long textTransformId;
-    private Long summaryId;
-    private Long quizId;
     private String subjectName;
     private String professorName;
     private String days;
     private LocalTime startTime;
     private LocalTime endTime;
 
+
     // Getters
+
     public Long getSubjectId() {
         return subjectId;
     }
@@ -29,17 +28,6 @@ public class CreateSubjectRequest {
         this.profileId = profileId;
     }
 
-    public Long getTextTransformId() {
-        return textTransformId;
-    }
-
-    public Long getSummaryId() {
-        return summaryId;
-    }
-
-    public Long getQuizId() {
-        return quizId;
-    }
 
     public String getSubjectName() {
         return subjectName;

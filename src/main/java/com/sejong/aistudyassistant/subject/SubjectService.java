@@ -8,13 +8,12 @@ import com.sejong.aistudyassistant.subject.dto.CreateSubjectRequest;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectResponse;
 
 import com.sejong.aistudyassistant.subject.dto.ModifySubjectResponse;
-import jakarta.persistence.Column;
 import jakarta.transaction.Transactional;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalTime;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,9 +30,11 @@ public class SubjectService {
     @Autowired
     private ProfileRepository profileRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(SubjectService.class);
+
     @Transactional
 
-    public CreateSubjectResponse createSubject(CreateSubjectRequest request) {
+    public CreateSubjectResponse createSubject(CreateSubjectRequest request, Long userId) {
         Subject newSubject = new Subject();
 
         newSubject.setProfileId(request.getProfileId());
@@ -42,6 +43,7 @@ public class SubjectService {
         newSubject.setDays(request.getDays());
         newSubject.setStartTime(request.getStartTime());
         newSubject.setEndTime(request.getEndTime());
+        newSubject.setUserId(userId);
 
         Subject savedSubject = subjectRepository.save(newSubject);
 
@@ -71,53 +73,52 @@ public class SubjectService {
                 savedSubject.getProfessorName(),
                 savedSubject.getDays(),
                 savedSubject.getStartTime(),
-                savedSubject.getEndTime()
+                savedSubject.getEndTime(),
+                savedSubject.getUserId()
         );
     }
 
     // 특정 유저의 특정 과목 삭제 (userId를 사용하여)
     @Transactional
-    public boolean deleteSubject(Long userId, Long id) {
-        // userId로 profile 조회
-        Profile profile = profileRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Profile not found for userId: " + userId));
+    public boolean deleteSubject(Long userId, Long subjectId) {
+        logger.info("Attempting to delete subject with id {} for user {}", subjectId, userId);
 
-        // profileId와 subjectId로 과목 조회 및 삭제
-        Subject subject = subjectRepository.findByProfileIdAndId(profile.getProfileId(), id);
-        if (subject != null) {
-            subjectRepository.delete(subject);
-            return true;  // 삭제 성공 시 true 반환
-        } else {
-            return false; // 해당 유저의 과목이 없으면 false 반환
-        }
+        Subject subject = subjectRepository.findByUserIdAndId(userId, subjectId)
+                .orElseThrow(() -> {
+                    logger.error("Subject not found for userId: {} and subjectId: {}", userId, subjectId);
+                    return new RuntimeException("Subject not found for userId: " + userId + " and subjectId: " + subjectId);
+                });
+
+        logger.info("Subject found. Deleting subject with id: {}", subjectId);
+        subjectRepository.delete(subject);
+        return true;
     }
 
     // 특정 유저의 특정 과목 수정 (userId를 사용하여)
     @Transactional
-    public ModifySubjectResponse modifySubject(Long userId, Long id, String modifySubjectName) {
-        // userId로 profile 조회
-        Profile profile = profileRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Profile not found for userId: " + userId));
+    public ModifySubjectResponse modifySubject(Long userId, Long subjectId, String modifySubjectName) {
+        logger.info("Attempting to modify subject with id {} for user {}", subjectId, userId);
 
-        // profileId와 subjectId로 과목 조회
-        Subject modifySubject = subjectRepository.findByProfileIdAndId(profile.getProfileId(), id);
-        if (modifySubject != null) {
-            // 과목 정보 수정
-            modifySubject.setSubjectName(modifySubjectName);
+        Subject subject = subjectRepository.findByUserIdAndId(userId, subjectId)
+                .orElseThrow(() -> {
+                    logger.error("Subject not found for userId: {} and subjectId: {}", userId, subjectId);
+                    return new RuntimeException("Subject not found for userId: " + userId + " and subjectId: " + subjectId);
+                });
 
-            // 수정된 과목 저장
-            return new ModifySubjectResponse(
-                    modifySubject.getId(),
-                    modifySubject.getProfileId(),
-                    modifySubject.getSubjectName(),
-                    modifySubject.getProfessorName(),
-                    modifySubject.getDays(),
-                    modifySubject.getStartTime(),
-                    modifySubject.getEndTime()
-            );
-        }
-        else {
-            throw new RuntimeException("Subject not found for the provided subjectId.");
-        }
+        subject.setSubjectName(modifySubjectName);
+        Subject savedSubject = subjectRepository.save(subject);
+
+        logger.info("Subject modified successfully. New name: {}", modifySubjectName);
+
+        return new ModifySubjectResponse(
+                savedSubject.getId(),
+                savedSubject.getProfileId(),
+                savedSubject.getSubjectName(),
+                savedSubject.getProfessorName(),
+                savedSubject.getDays(),
+                savedSubject.getStartTime(),
+                savedSubject.getEndTime(),
+                savedSubject.getUserId()
+        );
     }
 }

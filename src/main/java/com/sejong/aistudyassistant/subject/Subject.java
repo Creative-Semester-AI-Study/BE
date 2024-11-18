@@ -41,7 +41,17 @@ public class Subject {
     @Column(nullable = false, length = 20)
     private LocalTime endTime;
 
-    // Getters and Setters
+
+    private Long userId;
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+// Getters and Setters
 
     public Long getProfileId() {
         return profileId;

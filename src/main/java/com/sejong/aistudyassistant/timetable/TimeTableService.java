@@ -1,6 +1,7 @@
 package com.sejong.aistudyassistant.timetable;
 
 import com.sejong.aistudyassistant.subject.Subject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

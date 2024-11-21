@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface TimeTableRepository extends JpaRepository<DayTimeTable, Long> {
     Optional<DayTimeTable> findDayTimeTableByDay(String day);
+
 }

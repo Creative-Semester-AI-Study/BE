@@ -49,9 +49,6 @@ public class SubjectService {
 
         Subject savedSubject = subjectRepository.save(newSubject);
 
-        // TimeTable에 과목 추가
-        //timeTableService.addSubjectTimeTable(request.getDays(), savedSubject);
-
         // profileId로 MyPage 조회
         Optional<MyPage> myPageOptional = myPageRepository.findByProfileId(savedSubject.getProfileId());
 
@@ -70,6 +67,9 @@ public class SubjectService {
             newMyPage.setSubjectId(savedSubject.getId());
             myPageRepository.save(newMyPage);
         }
+
+        // TimeTable에 과목 추가
+        timeTableService.addSubjectTimeTable(request.getDays(), savedSubject);
 
         return new CreateSubjectResponse(
                 savedSubject.getId(),

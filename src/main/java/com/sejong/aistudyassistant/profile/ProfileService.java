@@ -46,7 +46,6 @@ public class ProfileService {
         profile.setStudentName(user.getName());
         // 프로필 이미지 설정 로직이 있다면 추가하세요
 
-        TimeTableService timeTableService = new TimeTableService();
         timeTableService.createTimeTable();
 
         Profile savedProfile = profileRepository.save(profile);

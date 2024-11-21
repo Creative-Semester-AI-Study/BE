@@ -7,6 +7,9 @@ import com.sejong.aistudyassistant.profile.ProfileRepository;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectRequest;
 import com.sejong.aistudyassistant.subject.dto.CreateSubjectResponse;
 import com.sejong.aistudyassistant.subject.dto.ModifySubjectResponse;
+import com.sejong.aistudyassistant.timetable.TimeTable;
+import com.sejong.aistudyassistant.timetable.TimeTableRepository;
+import com.sejong.aistudyassistant.timetable.TimeTableService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +30,9 @@ public class SubjectService {
     @Autowired
     private ProfileRepository profileRepository;
 
+    @Autowired
+    private TimeTableService timeTableService;
+
     private static final Logger logger = LoggerFactory.getLogger(SubjectService.class);
 
     @Transactional
@@ -42,6 +48,9 @@ public class SubjectService {
         newSubject.setUserId(userId);
 
         Subject savedSubject = subjectRepository.save(newSubject);
+
+        // TimeTable에 과목 추가
+        //timeTableService.addSubjectTimeTable(request.getDays(), savedSubject);
 
         // profileId로 MyPage 조회
         Optional<MyPage> myPageOptional = myPageRepository.findByProfileId(savedSubject.getProfileId());

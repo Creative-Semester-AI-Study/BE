@@ -5,6 +5,8 @@ import com.sejong.aistudyassistant.login.Repository.UserRepository;
 import com.sejong.aistudyassistant.mypage.MyPage;
 import com.sejong.aistudyassistant.mypage.MyPageRepository;
 import com.sejong.aistudyassistant.profile.dto.ProfileResponse;
+import com.sejong.aistudyassistant.timetable.TimeTable;
+import com.sejong.aistudyassistant.timetable.TimeTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -23,6 +25,9 @@ public class ProfileService {
     @Autowired
     private MyPageRepository myPageRepository;
 
+    @Autowired
+    private TimeTableService timeTableService;
+
     // User 정보로 Profile 생성
     public Profile createProfile(User user) {
         logger.info("Creating profile for userId: {}", user.getUserId());
@@ -40,6 +45,9 @@ public class ProfileService {
         profile.setStudentId(user.getUserId());
         profile.setStudentName(user.getName());
         // 프로필 이미지 설정 로직이 있다면 추가하세요
+
+        TimeTableService timeTableService = new TimeTableService();
+        timeTableService.createTimeTable();
 
         Profile savedProfile = profileRepository.save(profile);
         logger.info("Profile created successfully with ID: {}", savedProfile.getProfileId());

@@ -16,6 +16,7 @@ public class TargetDaySubestsResponse {
     private String professorName;
     private LocalTime startTime;
     private LocalTime endTime;
+    private String learningStatus;
 
     private Long userId;
 
@@ -23,7 +24,7 @@ public class TargetDaySubestsResponse {
         return userId;
     }
     public TargetDaySubestsResponse(Long subjectId, Long profileId, String subjectName,
-                                 String professorName, String days, LocalTime startTime, LocalTime endTime, Long userId) {
+                                 String professorName, String days, LocalTime startTime, LocalTime endTime, Long userId, String learningStatus) {
         this.subjectId = subjectId;
         this.profileId = profileId;
         this.subjectName = subjectName;
@@ -32,6 +33,7 @@ public class TargetDaySubestsResponse {
         this.startTime = startTime;
         this.endTime = endTime;
         this.userId=userId;
+        this.learningStatus = learningStatus;
     }
 
     // Getters

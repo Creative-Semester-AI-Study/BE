@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -157,7 +159,7 @@ public class SubjectService {
         List<Subject> targetDaySubjects = new ArrayList<>();
 
         for (Subject subject : allSubjects) {
-            if(subject.getDays().contains(targetDayKorean)){
+            if (subject.getDays().contains(targetDayKorean)) {
                 targetDaySubjects.add(subject);
             }
         }
@@ -174,18 +176,21 @@ public class SubjectService {
 
         logger.info("{} subjects found for user {} on {}", targetDaySubjects.size(), userId, targetDayKorean);
 
-        List<TargetDaySubestsResponse> response = sortedSubjects.stream().map(subject -> {
-            TargetDaySubestsResponse dto = new TargetDaySubestsResponse(
-                    subject.getId(),
-                    subject.getProfileId(),
-                    subject.getSubjectName(),
-                    subject.getProfessorName(),
-                    subject.getDays(),
-                    subject.getStartTime(),
-                    subject.getEndTime(),
-                    subject.getUserId());
-            return dto;
-        }).collect(Collectors.toList());
+        List<TargetDaySubestsResponse> response = sortedSubjects.stream()
+                .map(subject -> {
+                    String learningState = getLearningStatus(subject.getStartTime(), subject.getEndTime());
+                    return new TargetDaySubestsResponse(
+                            subject.getId(),
+                            subject.getProfileId(),
+                            subject.getSubjectName(),
+                            subject.getProfessorName(),
+                            subject.getDays(),
+                            subject.getStartTime(),
+                            subject.getEndTime(),
+                            subject.getUserId(),
+                            learningState
+                    );
+                }).collect(Collectors.toList());
 
         return response;
     }
@@ -224,6 +229,19 @@ public class SubjectService {
                 return "일";
             default:
                 throw new IllegalArgumentException("잘못된 요일 값입니다: " + dayOfWeek);
+        }
+    }
+
+    @Transactional
+    public String getLearningStatus(LocalTime startTime, LocalTime endTime) {
+        LocalTime currentTime = LocalTime.now();
+
+        if (currentTime.isBefore(startTime)) {
+            return "학습 전";
+        } else if (currentTime.isAfter(startTime) && currentTime.isBefore(endTime)) {
+            return "녹음 시작";
+        } else {
+            return "요약 보기";
         }
     }
 }

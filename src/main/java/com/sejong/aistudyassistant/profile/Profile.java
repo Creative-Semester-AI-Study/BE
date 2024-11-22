@@ -1,6 +1,5 @@
 package com.sejong.aistudyassistant.profile;
 
-import com.sejong.aistudyassistant.timetable.TimeTable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

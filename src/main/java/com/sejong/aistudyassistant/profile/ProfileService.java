@@ -25,9 +25,6 @@ public class ProfileService {
     @Autowired
     private MyPageRepository myPageRepository;
 
-    @Autowired
-    private TimeTableService timeTableService;
-
     // User 정보로 Profile 생성
     public Profile createProfile(User user) {
         logger.info("Creating profile for userId: {}", user.getUserId());

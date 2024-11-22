@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,16 @@ public class SubjectController {
         this.subjectService = subjectService;
         this.jwtUtil = jwtUtil;
     }
+
+    //특정 과목 조회
+    @GetMapping("/{subjectId}")
+    public ResponseEntity<CheckSubjectResponse> checkSubject(@PathVariable Long subjectId, @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        CheckSubjectResponse response = subjectService.checkSubject(userId, subjectId);
+        return ResponseEntity.ok(response);
+    }
+
 
     // 과목 생성 엔드포인트
     @PostMapping("/createSubject")
@@ -63,7 +74,7 @@ public class SubjectController {
 
     // 특정 날짜 과목 조회
     @GetMapping("{date}")
-    public ResponseEntity<List<TargetDaySubestsResponse>> getSubjectsByUserIdAndDate(@RequestBody @PathVariable Date date,
+    public ResponseEntity<List<TargetDaySubestsResponse>> getSubjectsByUserIdAndDate(@PathVariable("date") LocalDate date,
                                                                                      @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);

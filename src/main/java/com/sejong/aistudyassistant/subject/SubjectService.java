@@ -3,11 +3,8 @@ package com.sejong.aistudyassistant.subject;
 import com.sejong.aistudyassistant.mypage.MyPage;
 import com.sejong.aistudyassistant.mypage.MyPageRepository;
 import com.sejong.aistudyassistant.profile.ProfileRepository;
-import com.sejong.aistudyassistant.subject.dto.CreateSubjectRequest;
-import com.sejong.aistudyassistant.subject.dto.CreateSubjectResponse;
-import com.sejong.aistudyassistant.subject.dto.ModifySubjectResponse;
+import com.sejong.aistudyassistant.subject.dto.*;
 
-import com.sejong.aistudyassistant.subject.dto.TargetDaySubestsResponse;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,6 +32,29 @@ public class SubjectService {
 
 
     private static final Logger logger = LoggerFactory.getLogger(SubjectService.class);
+
+    @Transactional
+    public CheckSubjectResponse checkSubject(Long userId, Long subjectId) {
+        logger.info("Attempting to modify subject with id {} for user {}", subjectId, userId);
+
+        Subject subject = subjectRepository.findByUserIdAndId(userId, subjectId)
+                .orElseThrow(() -> {
+                    logger.error("Subject not found for userId: {} and subjectId: {}", userId, subjectId);
+                    return new RuntimeException("Subject not found for userId: " + userId + " and subjectId: " + subjectId);
+                });
+
+
+        return new CheckSubjectResponse(
+                subject.getId(),
+                subject.getProfileId(),
+                subject.getSubjectName(),
+                subject.getProfessorName(),
+                subject.getDays(),
+                subject.getStartTime(),
+                subject.getEndTime(),
+                subject.getUserId()
+        );
+    }
 
     @Transactional
     public CreateSubjectResponse createSubject(CreateSubjectRequest request, Long userId) {
@@ -129,14 +147,11 @@ public class SubjectService {
 
     //오늘의 과목 조회(userId를 사용하여)
     @Transactional
-    public List<TargetDaySubestsResponse> getSubjectsByUserIdAndDate(Long userId, Date date) {
-        logger.info("Retrieving subjects for user {} on date {}", userId, date);
-
-        // Date를 LocalDate로 변환
-        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        DayOfWeek targetDayEnglish = localDate.getDayOfWeek();
+    public List<TargetDaySubestsResponse> getSubjectsByUserIdAndDate(Long userId, LocalDate localDate) {
+        logger.info("Retrieving subjects for user {} on date {}", userId, localDate);
 
         // 유저의 특정 요일 과목 조회
+        DayOfWeek targetDayEnglish = localDate.getDayOfWeek();
         List<Subject> allSubjects = getAllSubjectsByUserId(userId);
         String targetDayKorean = convertDayOfWeekToKorean(targetDayEnglish);
         List<Subject> targetDaySubjects = new ArrayList<>();

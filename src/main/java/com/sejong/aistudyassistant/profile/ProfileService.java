@@ -1,12 +1,9 @@
 package com.sejong.aistudyassistant.profile;
 
 import com.sejong.aistudyassistant.login.Entity.User;
-import com.sejong.aistudyassistant.login.Repository.UserRepository;
 import com.sejong.aistudyassistant.mypage.MyPage;
 import com.sejong.aistudyassistant.mypage.MyPageRepository;
 import com.sejong.aistudyassistant.profile.dto.ProfileResponse;
-import com.sejong.aistudyassistant.timetable.TimeTable;
-import com.sejong.aistudyassistant.timetable.TimeTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;

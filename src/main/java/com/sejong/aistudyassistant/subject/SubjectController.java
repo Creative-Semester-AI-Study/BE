@@ -26,14 +26,14 @@ public class SubjectController {
         this.jwtUtil = jwtUtil;
     }
 
-//    //특정 과목 조회
-//    @GetMapping("/{subjectId}")
-//    public ResponseEntity<CheckSubjectResponse> checkSubject(@PathVariable Long subjectId, @RequestHeader("Authorization") String authHeader){
-//        String token = authHeader.replace("Bearer ", "");
-//        Long userId = jwtUtil.getUserIdFromToken(token);
-//        CheckSubjectResponse response = subjectService.checkSubject(userId, subjectId);
-//        return ResponseEntity.ok(response);
-//    }
+    //특정 과목 조회
+    @GetMapping("/{subjectId}")
+    public ResponseEntity<CheckSubjectResponse> checkSubject(@PathVariable Long subjectId, @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        CheckSubjectResponse response = subjectService.checkSubject(userId, subjectId);
+        return ResponseEntity.ok(response);
+    }
 
 
     // 과목 생성 엔드포인트
@@ -73,7 +73,7 @@ public class SubjectController {
     }
 
     // 특정 날짜 과목 조회
-    @GetMapping("/{date}")
+    @GetMapping("check/{date}")
     public ResponseEntity<List<TargetDaySubestsResponse>> getSubjectsByUserIdAndDate(@PathVariable ("date") LocalDate date,
                                                                                      @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");

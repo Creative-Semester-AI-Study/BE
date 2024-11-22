@@ -2,6 +2,7 @@ package com.sejong.aistudyassistant.subject;
 
 import com.sejong.aistudyassistant.mypage.MyPage;
 import com.sejong.aistudyassistant.mypage.MyPageRepository;
+import com.sejong.aistudyassistant.profile.Profile;
 import com.sejong.aistudyassistant.profile.ProfileRepository;
 import com.sejong.aistudyassistant.subject.dto.*;
 
@@ -152,6 +153,7 @@ public class SubjectService {
     public List<TargetDaySubestsResponse> getSubjectsByUserIdAndDate(Long userId, LocalDate localDate) {
         logger.info("Retrieving subjects for user {} on date {}", userId, localDate);
 
+
         // 유저의 특정 요일 과목 조회
         DayOfWeek targetDayEnglish = localDate.getDayOfWeek();
         List<Subject> allSubjects = getAllSubjectsByUserId(userId);
@@ -166,7 +168,7 @@ public class SubjectService {
 
         if (targetDaySubjects.isEmpty()) {
             logger.warn("No subjects found for user {} on {}", userId, targetDayKorean);
-            throw new RuntimeException("No subjects found for user " + userId + " on " + targetDayKorean);
+            throw new RuntimeException("No subjects found for user " +userId + " on " + targetDayKorean);
         }
 
         //특정 요일 과목 정렬

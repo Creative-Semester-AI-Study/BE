@@ -7,6 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/study/Subject")
 public class SubjectController {
@@ -54,6 +58,17 @@ public class SubjectController {
         Long userId = jwtUtil.getUserIdFromToken(token);
 
         ModifySubjectResponse response = subjectService.modifySubject(userId, subjectId, request.getModifySubjectName());
+        return ResponseEntity.ok(response);
+    }
+
+    // 특정 날짜 과목 조회
+    @GetMapping("{date}")
+    public ResponseEntity<List<TargetDaySubestsResponse>> getSubjectsByUserIdAndDate(@RequestBody @PathVariable Date date,
+                                                                                     @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+
+        List<TargetDaySubestsResponse> response = subjectService.getSubjectsByUserIdAndDate(userId,date);
         return ResponseEntity.ok(response);
     }
 }

@@ -24,8 +24,4 @@ public class Profile {
 
     @Column(nullable = false, length = 100)
     private String studentName;
-
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "timetable_id")
-    private TimeTable timeTable;
 }

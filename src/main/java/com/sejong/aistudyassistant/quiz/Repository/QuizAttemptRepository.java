@@ -12,4 +12,7 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt,Long> {
 
     List<QuizAttempt> findByUserIdAndSummaryIdAndQuizIdBetween(Long userId, Long summaryId, Long startId, Long endId);
     QuizAttempt findByQuizId(Long quizId);
+
+    //복습 여부 구하기 위해 조회
+    List<QuizAttempt> findBySummaryId(Long summaryId); // summaryId로 QuizAttempt 조회
 }

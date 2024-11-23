@@ -34,6 +34,7 @@ public class SubjectService {
 
     private static final Logger logger = LoggerFactory.getLogger(SubjectService.class);
 
+    //특정 과목 조회기능
     @Transactional
     public CheckSubjectResponse checkSubject(Long userId, Long subjectId) {
         logger.info("Attempting to modify subject with id {} for user {}", subjectId, userId);

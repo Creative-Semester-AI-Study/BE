@@ -1,16 +1,13 @@
 package com.sejong.aistudyassistant.subject;
 
 import com.sejong.aistudyassistant.jwt.JwtUtil;
-import com.sejong.aistudyassistant.stt.TranscriptionService;
 import com.sejong.aistudyassistant.subject.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/study/Subject")
@@ -73,13 +70,23 @@ public class SubjectController {
     }
 
     // 특정 날짜 과목 조회
-    @GetMapping("check/{date}")
-    public ResponseEntity<List<TargetDaySubestsResponse>> getSubjectsByUserIdAndDate(@PathVariable ("date") LocalDate date,
+    @GetMapping("/check/{date}")
+    public ResponseEntity<List<TargetDaySubjectResponse>> getSubjectsByUserIdAndDate(@PathVariable ("date") LocalDate date,
                                                                                      @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);
 
-        List<TargetDaySubestsResponse> response = subjectService.getSubjectsByUserIdAndDate(userId,date);
+        List<TargetDaySubjectResponse> response = subjectService.getSubjectsByUserIdAndDate(userId,date);
+        return ResponseEntity.ok(response);
+    }
+
+    // 다음 과목 조회
+    @GetMapping("/nextSubject")
+    public ResponseEntity<NextSubjectResponse> getNextSubject(@RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+
+        NextSubjectResponse response = subjectService.getNextSubject(userId);
         return ResponseEntity.ok(response);
     }
 }

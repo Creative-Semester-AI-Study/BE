@@ -2,7 +2,6 @@ package com.sejong.aistudyassistant.subject;
 
 import com.sejong.aistudyassistant.mypage.MyPage;
 import com.sejong.aistudyassistant.mypage.MyPageRepository;
-import com.sejong.aistudyassistant.profile.Profile;
 import com.sejong.aistudyassistant.profile.ProfileRepository;
 import com.sejong.aistudyassistant.subject.dto.*;
 
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -150,9 +148,8 @@ public class SubjectService {
 
     //오늘의 과목 조회(userId를 사용하여)
     @Transactional
-    public List<TargetDaySubestsResponse> getSubjectsByUserIdAndDate(Long userId, LocalDate localDate) {
+    public List<TargetDaySubjectResponse> getSubjectsByUserIdAndDate(Long userId, LocalDate localDate) {
         logger.info("Retrieving subjects for user {} on date {}", userId, localDate);
-
 
         // 유저의 특정 요일 과목 조회
         DayOfWeek targetDayEnglish = localDate.getDayOfWeek();
@@ -178,10 +175,10 @@ public class SubjectService {
 
         logger.info("{} subjects found for user {} on {}", targetDaySubjects.size(), userId, targetDayKorean);
 
-        List<TargetDaySubestsResponse> response = sortedSubjects.stream()
+        List<TargetDaySubjectResponse> response = sortedSubjects.stream()
                 .map(subject -> {
                     String learningState = getLearningStatus(subject.getStartTime(), subject.getEndTime());
-                    return new TargetDaySubestsResponse(
+                    return new TargetDaySubjectResponse(
                             subject.getId(),
                             subject.getProfileId(),
                             subject.getSubjectName(),
@@ -245,5 +242,107 @@ public class SubjectService {
         } else {
             return "요약 보기";
         }
+    }
+
+    @Transactional
+    public NextSubjectResponse getNextSubject(Long userId){
+        // 모든 요일 과목 조회
+        LocalDate day = LocalDate.now();
+        LocalDate initialDay = day;//day 복사해두기
+        DayOfWeek targetDayEnglish = day.getDayOfWeek();
+        List<Subject> allSubjects = getAllSubjectsByUserId(userId);
+        if (allSubjects.isEmpty()) {
+            logger.warn("No subjects found for userId: {}", userId);
+            throw new RuntimeException("No subjects found for userId: " + userId);
+        }
+
+        //요일 한국어로 바꾸기
+        String targetDayKorean = convertDayOfWeekToKorean(targetDayEnglish);
+
+        //nextSubject 초기 선언
+        Subject nextSubject=null;
+        do{
+            //특정 요일 과목 조회
+            List<Subject> targetDaySubjects = new ArrayList<>();
+            for (Subject subject : allSubjects) {
+                if (subject.getDays().contains(targetDayKorean)) {
+                    targetDaySubjects.add(subject);
+                }
+            }
+            if(targetDaySubjects.isEmpty()){
+                logger.warn("오늘에 해당하는 과목 못 찾음");
+                targetDayKorean = convertNextDay(targetDayKorean);
+                continue;
+            }
+
+            //현재 시간 이후의 과목 조회
+            List<Subject> availableTodaySubjects = new ArrayList<>();
+            for (Subject targetDaySubject : targetDaySubjects) {
+                LocalTime currentTime = LocalTime.now();
+                targetDaySubject.getEndTime().isAfter(currentTime);
+                availableTodaySubjects.add(targetDaySubject);
+            }
+            if (availableTodaySubjects.isEmpty()) {
+                logger.warn("오늘에 해당하는 다음과목 못 찾음");
+                targetDayKorean = convertNextDay(targetDayKorean);
+                continue;
+            }
+
+            //과목 정렬
+            List<Subject> sortedSubjects = availableTodaySubjects.stream()
+                    .sorted((s1, s2) -> s1.getStartTime().compareTo(s2.getStartTime()))
+                    .collect(Collectors.toList());
+
+            //다음 과목 찾기
+            nextSubject = sortedSubjects.get(0);
+            if(nextSubject!=null){
+                logger.warn("다음 과목 안 비어있음");
+                break;
+            }
+        }while(day==initialDay); //한 바퀴 돌면 종료
+
+        //못 찾으면 에러발생
+        if (nextSubject==null) {
+            logger.warn("No NextSubject found for userId: {}", userId);
+            throw new RuntimeException("No NextSubject found for userId: " + userId);
+        }
+
+        return new NextSubjectResponse(
+                nextSubject.getId(),
+                nextSubject.getProfileId(),
+                nextSubject.getSubjectName(),
+                nextSubject.getProfessorName(),
+                nextSubject.getDays(),
+                nextSubject.getStartTime(),
+                nextSubject.getEndTime(),
+                nextSubject.getUserId(),
+                getLearningStatusByNextSubject(nextSubject.getDays(),nextSubject.getStartTime(), nextSubject.getEndTime())
+        );
+    }
+
+    public String convertNextDay(String day){
+        switch(day){
+            case "월": return "화";
+            case "화": return "수";
+            case "수": return "목";
+            case "목": return "금";
+            case "금": return "월";
+            case "토": return "월";
+            case "일": return "월";
+        }
+        return null;
+    }
+
+    public String getLearningStatusByNextSubject(String days, LocalTime startTime, LocalTime endTime) {
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+
+        DayOfWeek targetDayEnglish = currentDate.getDayOfWeek();
+        String targetDayKorean = convertDayOfWeekToKorean(targetDayEnglish);
+
+        if(days.contains(targetDayKorean)&& startTime.isBefore(currentTime) && endTime.isAfter(currentTime)){
+            return "녹음시작";
+        }
+        else return "학습 전";
     }
 }

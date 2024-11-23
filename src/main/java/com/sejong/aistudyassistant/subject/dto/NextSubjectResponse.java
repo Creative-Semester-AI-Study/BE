@@ -1,14 +1,11 @@
 package com.sejong.aistudyassistant.subject.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
 
 @Data
-public class TargetDaySubestsResponse {
+public class NextSubjectResponse {
     private Long subjectId;
     private Long profileId;
     private String subjectName;
@@ -23,8 +20,8 @@ public class TargetDaySubestsResponse {
     public Long getUserId() {
         return userId;
     }
-    public TargetDaySubestsResponse(Long subjectId, Long profileId, String subjectName,
-                                 String professorName, String days, LocalTime startTime, LocalTime endTime, Long userId, String learningStatus) {
+    public NextSubjectResponse(Long subjectId, Long profileId, String subjectName,
+                               String professorName, String days, LocalTime startTime, LocalTime endTime, Long userId, String learningStatus) {
         this.subjectId = subjectId;
         this.profileId = profileId;
         this.subjectName = subjectName;

@@ -1,27 +1,37 @@
 package com.sejong.aistudyassistant.stats;
 
 public class MonthStatsDTO {
-    private int totalReviews;
-    private int completedReviews;
+    private int monthTotalReviews;
+    private int monthCompletedReviews;
+    private int monthReviewPercentage;
 
-    public MonthStatsDTO(int totalReviews, int completedReviews) {
-        this.totalReviews = totalReviews;
-        this.completedReviews = completedReviews;
+    public MonthStatsDTO(int monthTotalReviews, int monthCompletedReviews, int monthReviewPercentage) {
+        this.monthTotalReviews = monthTotalReviews;
+        this.monthCompletedReviews = monthCompletedReviews;
+        this.monthReviewPercentage = monthReviewPercentage;
     }
 
-    public int getTotalReviews() {
-        return totalReviews;
+    public int getMonthTotalReviews() {
+        return monthTotalReviews;
     }
 
-    public void setTotalReviews(int totalReviews) {
-        this.totalReviews = totalReviews;
+    public void setMonthTotalReviews(int monthTotalReviews) {
+        this.monthTotalReviews = monthTotalReviews;
     }
 
-    public int getCompletedReviews() {
-        return completedReviews;
+    public int getMonthCompletedReviews() {
+        return monthCompletedReviews;
     }
 
-    public void setCompletedReviews(int completedReviews) {
-        this.completedReviews = completedReviews;
+    public void setMonthCompletedReviews(int monthCompletedReviews) {
+        this.monthCompletedReviews = monthCompletedReviews;
+    }
+
+    public int getMonthReviewPercentage() {
+        return monthReviewPercentage;
+    }
+
+    public void setMonthReviewPercentage(int monthReviewPercentage) {
+        this.monthReviewPercentage = monthReviewPercentage;
     }
 }

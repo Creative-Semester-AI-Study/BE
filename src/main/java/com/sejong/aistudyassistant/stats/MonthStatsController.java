@@ -24,7 +24,7 @@ public class MonthStatsController {
     }
 
     @GetMapping
-    public ResponseEntity<TodayStatsDTO> getMonthReviewStats(
+    public ResponseEntity<MonthStatsDTO> getMonthReviewStats(
             @RequestHeader("Authorization") String authHeader,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate month) {
 
@@ -40,20 +40,23 @@ public class MonthStatsController {
         LocalDate startOfMonth = yearMonth.atDay(1);
         LocalDate endOfMonth = yearMonth.atEndOfMonth();
 
-        int totalReviews = 0;
-        int completedReviews = 0;
+        int monthTotalReviews = 0;
+        int monthCompletedReviews = 0;
+        int monthReviewPercentage = 0;
 
         // 해당 월의 모든 날짜에 대해 반복
         for (LocalDate date = startOfMonth; !date.isAfter(endOfMonth); date = date.plusDays(1)) {
             List<ReviewScheduleDTO> dailySchedules = reviewScheduleService.findReviewsForDate(userId, date);
-            totalReviews += dailySchedules.size();
-            completedReviews += dailySchedules.stream()
+            monthTotalReviews += dailySchedules.size();
+            monthCompletedReviews += dailySchedules.stream()
                     .filter(ReviewScheduleDTO::isReviewed)
                     .count();
         }
 
+        monthReviewPercentage = (int) Math.round(((double) monthCompletedReviews / monthTotalReviews) * 100);
+
         // 통계 DTO 생성 및 반환
-        TodayStatsDTO stats = new TodayStatsDTO(totalReviews, completedReviews);
+        MonthStatsDTO stats = new MonthStatsDTO(monthTotalReviews, monthCompletedReviews, monthReviewPercentage);
         return ResponseEntity.ok(stats);
     }
 }

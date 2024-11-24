@@ -39,7 +39,7 @@ public class ReviewScheduleService {
             // 리포지토리 메서드 업데이트 필요: findByUserIdAndCreatedAtBetween 사용
             List<Transcript> transcripts = transcriptRepository.findByUserIdAndCreatedAtBetween(userId, targetStartDate, targetEndDate);
             List<ReviewScheduleDTO> periodReviews = transcripts.stream()
-                    .map(transcript -> createReviewScheduleDTO(transcript, dayInterval, date))
+                    .map(transcript -> createReviewScheduleDTO(userId, transcript, dayInterval, date))
                     .collect(Collectors.toList());
             reviewSchedules.addAll(periodReviews);
         }
@@ -47,14 +47,14 @@ public class ReviewScheduleService {
     }
 
 
-    private ReviewScheduleDTO createReviewScheduleDTO(Transcript transcript, int dayInterval, LocalDate date) {
+    private ReviewScheduleDTO createReviewScheduleDTO(Long userId, Transcript transcript, int dayInterval, LocalDate date) {
         Long summaryId = transcript.getSummaryId();
         String subjectName = transcript.getSubject().getSubjectName();
         String startTime = transcript.getSubject().getStartTime().toString();
         String endTime = transcript.getSubject().getEndTime().toString();
         LocalDate dateOnly = transcript.getCreatedAt().toLocalDate();
 
-        boolean reviewed = checkIfReviewed(summaryId, date);
+        boolean reviewed = checkIfReviewed(userId, summaryId, date, dayInterval);
 
         return new ReviewScheduleDTO(
                 summaryId,
@@ -67,13 +67,43 @@ public class ReviewScheduleService {
         );
     }
 
-    public boolean checkIfReviewed(Long summaryId, LocalDate date) {
-        // summaryId를 이용해 quizAttemptRepository에서 데이터를 가져옴
-        List<QuizAttempt> attempts = quizAttemptRepository.findBySummaryId(summaryId);
+    public boolean checkIfReviewed(Long userId, Long summaryId, LocalDate date, int dayInterval) {
+        // userId와 summaryId를 모두 사용해 QuizAttempt 조회
+        List<QuizAttempt> attempts = quizAttemptRepository.findByUserIdAndSummaryId(userId, summaryId);
 
-        // 주어진 date와 attemptDate가 같은 경우가 있으면 복습 완료(true)
+        // dayIntervals 배열 설정
+        int[] dayIntervals = {1, 3, 7, 15, 30};
+
+        // 현재 dayInterval의 index를 찾음
+        int currentIndex = -1;
+        for (int i = 0; i < dayIntervals.length; i++) {
+            if (dayIntervals[i] == dayInterval) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        if (currentIndex == -1) {
+            throw new IllegalArgumentException("Invalid dayInterval: " + dayInterval);
+        }
+
+        // 이전 간격 계산
+        int previousInterval = currentIndex == 0 ? 0 : dayIntervals[currentIndex - 1];
+
+        // targetDate 범위 설정
+        LocalDate targetStartDate = date.minusDays(
+                dayIntervals[currentIndex] - previousInterval); // 시작 범위
+        LocalDate targetEndDate = date; // 종료 범위 (date 포함)
+
+        // targetDate 범위 내에서 복습 여부 확인
         return attempts.stream()
-                .anyMatch(attempt -> LocalDate.parse(attempt.getAttemptDate()).isEqual(date));
+                .anyMatch(attempt -> {
+                    LocalDate attemptDate = LocalDate.parse(attempt.getAttemptDate());
+                    return attemptDate.isAfter(targetStartDate)
+                            && attemptDate.isBefore(targetEndDate.plusDays(1));
+                });
     }
+
+
 }
 

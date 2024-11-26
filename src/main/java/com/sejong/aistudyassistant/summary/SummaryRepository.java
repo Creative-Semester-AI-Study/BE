@@ -8,7 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface SummaryRepository extends JpaRepository<Summary, Long> {
-
     Summary findByTranscriptId(Long transcriptId);
-
 }

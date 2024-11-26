@@ -2,6 +2,7 @@ package com.sejong.aistudyassistant.quiz;
 
 import com.sejong.aistudyassistant.jwt.JwtUtil;
 import com.sejong.aistudyassistant.quiz.dto.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,6 @@ public class QuizController {
 
     private final QuizService quizService;
     private final JwtUtil jwtUtil;
-
 
     public QuizController(QuizService quizService,JwtUtil jwtUtil) {
         this.quizService = quizService;

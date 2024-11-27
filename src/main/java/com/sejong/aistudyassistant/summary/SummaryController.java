@@ -1,7 +1,7 @@
 package com.sejong.aistudyassistant.summary;
 
+import com.sejong.aistudyassistant.summary.dto.SummaryResponseDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 

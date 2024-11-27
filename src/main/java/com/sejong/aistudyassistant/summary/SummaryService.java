@@ -42,7 +42,6 @@ public class SummaryService {
                     return pollForResult(rid, transcriptId);
                 });
     }
-
     private Mono<Summary> pollForResult(String rid, Long transcriptId) {
         return webClient.get()
                 .uri("/nlp/v1/async/minutes/{rid}", rid)

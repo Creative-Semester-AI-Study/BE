@@ -15,12 +15,11 @@ public class QuizController {
     private final QuizService quizService;
     private final JwtUtil jwtUtil;
 
-
     public QuizController(QuizService quizService,JwtUtil jwtUtil) {
         this.quizService = quizService;
         this.jwtUtil=jwtUtil;
     }
-
+/*
     @PostMapping("/create")
     public ResponseEntity<Void> createQuiz(@RequestHeader("Authorization") String authHeader,@RequestBody CreateQuizRequest quizRequest) {
         String token = authHeader.replace("Bearer ", "");
@@ -32,7 +31,7 @@ public class QuizController {
             return ResponseEntity.status(500).body(null);
         }
     }
-
+*/
     @GetMapping("/learning")
     public ResponseEntity<List<GetLearningQuizResponse>> getLearningQuiz(@RequestHeader("Authorization") String authHeader,@RequestBody GetLearningQuizRequest quizRequest) {
 
@@ -72,15 +71,25 @@ public class QuizController {
     }
 
     @GetMapping("/learning/result")
-    public ResponseEntity<GetLearningResultResponse> getLearningResult(@RequestHeader("Authorization") String authHeader,@RequestBody GetLearningResultRequest quizRequest) {
+    public ResponseEntity<GetQuizResultResponse> getQuizResult(@RequestHeader("Authorization") String authHeader, @RequestBody GetQuizResultRequest quizRequest) {
 
         String token = authHeader.replace("Bearer ", "");
         Long userId=jwtUtil.getUserIdFromToken(token);
         try {
-            return ResponseEntity.ok(quizService.getLearningResult(userId, quizRequest.summaryId(),quizRequest.subjectId()));
+            return ResponseEntity.ok(quizService.getQuizResult(userId, quizRequest.summaryId(),quizRequest.subjectId(), quizRequest.dayInterval()));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }
     }
+/*
+    public ResponseEntity<GetRecentQuizzesResponse> getRecentQuizzes(@RequestHeader("Authorization") String authHeader,@RequestBody GetRecentQuizzesRequest quizzesRequest){
 
+        String token = authHeader.replace("Bearer ", "");
+        Long userId=jwtUtil.getUserIdFromToken(token);
+        try {
+            return ResponseEntity.ok(quizService.getRecentQuizzes(userId));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }*/
 }

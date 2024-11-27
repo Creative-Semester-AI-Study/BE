@@ -1,9 +1,10 @@
 package com.sejong.aistudyassistant.quiz.dto;
 
-public record GetLearningResultRequest (
+public record GetQuizResultRequest(
 
         Long userId,
         Long summaryId,
-        Long subjectId
+        Long subjectId,
+        Integer dayInterval
 
 ){}

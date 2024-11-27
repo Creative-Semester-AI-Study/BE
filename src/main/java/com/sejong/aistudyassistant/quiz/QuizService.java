@@ -131,7 +131,6 @@ public class QuizService {
         }
     }
 
-
     List<GetLearningQuizResponse> getLearningQuiz(Long userId, Long summaryId){
 
         List<GetLearningQuizResponse> quizList=new ArrayList<>();
@@ -153,7 +152,9 @@ public class QuizService {
     public List<GetReviewQuizResponse> getReviewQuiz(Long userId, Long summaryId, Integer dayInterval){
 
         List<GetReviewQuizResponse> quizList=new ArrayList<>();
-        Long startId = calculateStartingQuizId(dayInterval).longValue();
+        System.out.println("1");
+        Long startId = calculateStartingQuizId(summaryId,dayInterval).longValue();
+        System.out.println(startId);
         List<Quiz> quizzes=quizRepository.findByUserIdAndSummaryIdAndQuizIdBetween(userId, summaryId, startId,startId+4);
 
         for(Quiz quiz: quizzes){
@@ -198,9 +199,11 @@ public class QuizService {
         return quizResponse;
     }
 
-    public GetLearningResultResponse getLearningResult(Long userId, Long summaryId,Long subjectId){
+    public GetQuizResultResponse getQuizResult(Long userId, Long summaryId, Long subjectId, Integer dayInterval){
 
-        List<QuizAttempt> quizList=quizAttemptRepository.findByUserIdAndSummaryIdAndQuizIdBetween(userId,summaryId,1L,5L);
+        Long startId=calculateStartingQuizId(summaryId,dayInterval).longValue();
+
+        List<QuizAttempt> quizList=quizAttemptRepository.findByUserIdAndSummaryIdAndQuizIdBetween(userId,summaryId,startId,startId+4);
         int correctAnswers=0;
 
         for(QuizAttempt quiz: quizList){
@@ -210,23 +213,37 @@ public class QuizService {
         Optional<Subject> subject=subjectRepository.findById(subjectId);
         QuizAttempt quizAttempt=quizAttemptRepository.findByQuizId(1L);
 
-        GetLearningResultResponse resultResponse=new GetLearningResultResponse(userId, summaryId,quizAttempt.getAttemptDate(),subject.get().getSubjectName(),5,correctAnswers);
+        GetQuizResultResponse resultResponse=new GetQuizResultResponse(userId, summaryId,quizAttempt.getAttemptDate(),subject.get().getSubjectName(),5,correctAnswers);
         return resultResponse;
     }
 
-    private Integer calculateStartingQuizId(Integer dayInterval){
+    /*
+    //최근 퀴즈 5개 가져오는 거
+    public GetRecentQuizzesResponse getRecentQuizzes(Long userId){
 
-        switch (dayInterval){
+    }
+*/
+    private Integer calculateStartingQuizId(Long summaryId, Integer dayInterval) {
+        System.out.println("2");
+        Integer baseQuizId = quizRepository.findFirstQuizIdBySummaryId(summaryId).intValue();
+        System.out.println("3");
+        if (baseQuizId == null) {
+            throw new IllegalArgumentException("해당 요약문에 대한 퀴즈가 존재하지 않습니다: " + summaryId);
+        }
+        System.out.println("4");
+        switch (dayInterval) {
+            case 0:
+                return baseQuizId;
             case 1:
-                return 6;
+                return baseQuizId + 5;
             case 3:
-                return 11;
+                return baseQuizId + 10;
             case 7:
-                return 16;
+                return baseQuizId + 15;
             case 15:
-                return 21;
+                return baseQuizId + 20;
             case 30:
-                return 26;
+                return baseQuizId + 25;
             default:
                 throw new IllegalArgumentException("잘못된 주기입니다: " + dayInterval);
         }

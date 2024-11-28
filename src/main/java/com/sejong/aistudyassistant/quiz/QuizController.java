@@ -32,26 +32,14 @@ public class QuizController {
         }
     }
 */
-    @GetMapping("/learning")
-    public ResponseEntity<List<GetLearningQuizResponse>> getLearningQuiz(@RequestHeader("Authorization") String authHeader,@RequestBody GetLearningQuizRequest quizRequest) {
+
+    @GetMapping("/get")
+    public ResponseEntity<List<GetQuizzesResponse>> getQuizzes(@RequestHeader("Authorization") String authHeader, @RequestBody GetQuizzesRequest quizRequest) {
 
         String token = authHeader.replace("Bearer ", "");
         Long userId=jwtUtil.getUserIdFromToken(token);
         try {
-            List<GetLearningQuizResponse> quizResponseList = quizService.getLearningQuiz(userId, quizRequest.summaryId());
-            return ResponseEntity.ok(quizResponseList);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-
-    @GetMapping("/review")
-    public ResponseEntity<List<GetReviewQuizResponse>> getReviewQuiz(@RequestHeader("Authorization") String authHeader,@RequestBody GetReviewQuizRequest quizRequest) {
-
-        String token = authHeader.replace("Bearer ", "");
-        Long userId=jwtUtil.getUserIdFromToken(token);
-        try {
-            List<GetReviewQuizResponse> quizResponseList = quizService.getReviewQuiz(userId, quizRequest.summaryId(), quizRequest.dayInterval());
+            List<GetQuizzesResponse> quizResponseList = quizService.getQuizzes(userId, quizRequest.summaryId(), quizRequest.dayInterval());
             return ResponseEntity.ok(quizResponseList);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
@@ -70,7 +58,7 @@ public class QuizController {
         }
     }
 
-    @GetMapping("/learning/result")
+    @GetMapping("/result")
     public ResponseEntity<GetQuizResultResponse> getQuizResult(@RequestHeader("Authorization") String authHeader, @RequestBody GetQuizResultRequest quizRequest) {
 
         String token = authHeader.replace("Bearer ", "");
@@ -87,7 +75,7 @@ public class QuizController {
         String token = authHeader.replace("Bearer ", "");
         Long userId=jwtUtil.getUserIdFromToken(token);
         try {
-            return ResponseEntity.ok(quizService.getRecentQuizzes(userId));
+            return ResponseEntity.ok(quizService.getRecentQuizzes(userId);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }

@@ -12,4 +12,5 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt,Long> {
 
     List<QuizAttempt> findByUserIdAndSummaryIdAndQuizIdBetween(Long userId, Long summaryId, Long startId, Long endId);
     QuizAttempt findByQuizId(Long quizId);
+    List<QuizAttempt> findTop5ByOrderByQuizAttemptIdDesc();
 }

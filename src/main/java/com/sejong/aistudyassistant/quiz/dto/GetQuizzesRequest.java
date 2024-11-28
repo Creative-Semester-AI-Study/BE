@@ -1,7 +1,9 @@
 package com.sejong.aistudyassistant.quiz.dto;
 
-public record GetReviewQuizRequest (
+
+public record GetQuizzesRequest(
 
         Long summaryId,
         Integer dayInterval
+
 ){}

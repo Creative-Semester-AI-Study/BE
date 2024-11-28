@@ -23,10 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -131,30 +128,14 @@ public class QuizService {
         }
     }
 
-    List<GetLearningQuizResponse> getLearningQuiz(Long userId, Long summaryId){
+    public List<GetQuizzesResponse> getQuizzes(Long userId, Long summaryId, Integer dayInterval){
 
-        List<GetLearningQuizResponse> quizList=new ArrayList<>();
-        List<Quiz> quizzes=quizRepository.findTop5ByUserIdAndSummaryIdOrderByQuizId(userId,summaryId);
+        List<GetQuizzesResponse> quizList=new ArrayList<>();
 
-        for(Quiz quiz: quizzes){
-            Long quizId=quiz.getQuizId();
-            String question=quiz.getQuestion();
-            List<QuizOption> optionList=quizOptionRepository.findByQuizQuizId(quizId);
-            List<String> options = optionList.stream()
-                    .map(QuizOption::getOptionText)
-                    .collect(Collectors.toList());
-            GetLearningQuizResponse responseDTO=new GetLearningQuizResponse(quizId,question,options);
-            quizList.add(responseDTO);
-        }
-        return quizList;
-    }
+        if(dayInterval==null)
+            dayInterval=0;
 
-    public List<GetReviewQuizResponse> getReviewQuiz(Long userId, Long summaryId, Integer dayInterval){
-
-        List<GetReviewQuizResponse> quizList=new ArrayList<>();
-        System.out.println("1");
         Long startId = calculateStartingQuizId(summaryId,dayInterval).longValue();
-        System.out.println(startId);
         List<Quiz> quizzes=quizRepository.findByUserIdAndSummaryIdAndQuizIdBetween(userId, summaryId, startId,startId+4);
 
         for(Quiz quiz: quizzes){
@@ -164,7 +145,7 @@ public class QuizService {
             List<String> options = optionList.stream()
                     .map(QuizOption::getOptionText)
                     .collect(Collectors.toList());
-            GetReviewQuizResponse responseDTO=new GetReviewQuizResponse(quizId,question,options);
+            GetQuizzesResponse responseDTO=new GetQuizzesResponse(quizId,question,options);
             quizList.add(responseDTO);
         }
         return quizList;
@@ -216,21 +197,32 @@ public class QuizService {
         GetQuizResultResponse resultResponse=new GetQuizResultResponse(userId, summaryId,quizAttempt.getAttemptDate(),subject.get().getSubjectName(),5,correctAnswers);
         return resultResponse;
     }
-
-    /*
+/*
     //최근 퀴즈 5개 가져오는 거
     public GetRecentQuizzesResponse getRecentQuizzes(Long userId){
+        //퀴즈 어템프트에서 가장 최근 저장된 애들 5개 가져오기
+        //퀴즈 아이디 5개 뽑아낸다음 퀴즈 리스트를 가져온다 (옵션 포함)
+        //틀린 여부도 같이 보내줘야 할 것 같은데..+본인이 뭐 선택했는지
+        //퀴즈 총 개수(5)랑 맞은 개수도 같이 반환
+        //여튼 퀴즈는 저렇게 묶어서 쫙 보내고
+        //요약문으로 과목 찾아서 과목 이름, 과목의 날짜 가져온 뒤 날짜로 회차 계산해서 반환
+        //씁 걍 퀴즈의 문제, 선지, 정답, 선택한 답, 몇 개 맞았는지 즉 퀴즈 관련된 애들을 dto로 따로 음...클래스로 만드는 게 나을 듯
 
+        List<QuizAttempt> quizAttempt=quizAttemptRepository.findTop5ByOrderByQuizAttemptIdDesc();
+        //가장 최근 저장된 퀴즈 시도 객체 5개가 들어와있는 상태
+
+
+
+
+
+        return (new GetRecentQuizzesResponse(userId));
     }
 */
     private Integer calculateStartingQuizId(Long summaryId, Integer dayInterval) {
-        System.out.println("2");
         Integer baseQuizId = quizRepository.findFirstQuizIdBySummaryId(summaryId).intValue();
-        System.out.println("3");
         if (baseQuizId == null) {
             throw new IllegalArgumentException("해당 요약문에 대한 퀴즈가 존재하지 않습니다: " + summaryId);
         }
-        System.out.println("4");
         switch (dayInterval) {
             case 0:
                 return baseQuizId;

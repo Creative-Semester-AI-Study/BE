@@ -6,11 +6,21 @@ public class SummaryResponseDto {
     private String summaryText;
     private Long transcriptId;
 
-    public SummaryResponseDto(Long id, String summaryText, Long transcriptId) {
+    public Long getUserId() {
+        return userId;
+    }
+
+    private Long userId;
+
+    public SummaryResponseDto(Long userId) {
+        this.userId = userId;
+    }
+
+    public SummaryResponseDto(Long id, String summaryText, Long transcriptId, Long userId) {
         this.id=id;
         this.summaryText = summaryText;
         this.transcriptId = transcriptId;
-
+        this.userId = userId;
     }
 
     public Long getId() {

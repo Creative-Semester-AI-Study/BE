@@ -1,11 +1,13 @@
 package com.sejong.aistudyassistant.subject;
 
 import com.sejong.aistudyassistant.jwt.JwtUtil;
-import com.sejong.aistudyassistant.stt.TranscriptionService;
 import com.sejong.aistudyassistant.subject.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/study/subject")
@@ -20,6 +22,16 @@ public class SubjectController {
         this.subjectService = subjectService;
         this.jwtUtil = jwtUtil;
     }
+
+    //특정 과목 조회
+    @GetMapping("/{subjectId}")
+    public ResponseEntity<CheckSubjectResponse> checkSubject(@PathVariable Long subjectId, @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        CheckSubjectResponse response = subjectService.checkSubject(userId, subjectId);
+        return ResponseEntity.ok(response);
+    }
+
 
     // 과목 생성 엔드포인트
     @PostMapping("/createSubject")
@@ -54,6 +66,27 @@ public class SubjectController {
         Long userId = jwtUtil.getUserIdFromToken(token);
 
         ModifySubjectResponse response = subjectService.modifySubject(userId, subjectId, request.getModifySubjectName());
+        return ResponseEntity.ok(response);
+    }
+
+    // 특정 날짜 과목 조회
+    @GetMapping("/check/{date}")
+    public ResponseEntity<List<TargetDaySubjectResponse>> getSubjectsByUserIdAndDate(@PathVariable ("date") LocalDate date,
+                                                                                     @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+
+        List<TargetDaySubjectResponse> response = subjectService.getSubjectsByUserIdAndDate(userId,date);
+        return ResponseEntity.ok(response);
+    }
+
+    // 다음 과목 조회
+    @GetMapping("/nextSubject")
+    public ResponseEntity<NextSubjectResponse> getNextSubject(@RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+
+        NextSubjectResponse response = subjectService.getNextSubject(userId);
         return ResponseEntity.ok(response);
     }
 }

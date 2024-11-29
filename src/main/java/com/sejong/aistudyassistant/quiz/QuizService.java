@@ -160,6 +160,7 @@ public class QuizService {
         quizAttempt.setUserId(userId);
         quizAttempt.setSummaryId(summaryId);
         quizAttempt.setAttemptDate(LocalDate.now().toString());
+        quizAttempt.setChosenAnswer(answer);
 
         if(answer.equals(quiz.get().getCorrectAnswer())){
             quizAttempt.setCorrect(true);
@@ -197,7 +198,7 @@ public class QuizService {
         GetQuizResultResponse resultResponse=new GetQuizResultResponse(userId, summaryId,quizAttempt.getAttemptDate(),subject.get().getSubjectName(),5,correctAnswers);
         return resultResponse;
     }
-/*
+
     //최근 퀴즈 5개 가져오는 거
     public GetRecentQuizzesResponse getRecentQuizzes(Long userId){
         //퀴즈 어템프트에서 가장 최근 저장된 애들 5개 가져오기
@@ -211,13 +212,48 @@ public class QuizService {
         List<QuizAttempt> quizAttempt=quizAttemptRepository.findTop5ByOrderByQuizAttemptIdDesc();
         //가장 최근 저장된 퀴즈 시도 객체 5개가 들어와있는 상태
 
+        List<QuizDetailResponse> quizzes=new ArrayList<>();
+        //퀴즈 관련 정보들을 담기 위해서 빈 리스트를 만듦
+
+        for (QuizAttempt attempt: quizAttempt){
+            Optional<Quiz> quiz=quizRepository.findById(attempt.getQuizId());
+            //퀴즈시도객체에서 그에 해당하는 퀴즈를 찾아온다(정답, 질문, 요약본 아이디, 유저 아이디 존재)
+
+            List<QuizOption> optionList=quizOptionRepository.findByQuizQuizId(quiz.get().getQuizId());
+            List<String> options = optionList.stream()
+                    .map(QuizOption::getOptionText)
+                    .collect(Collectors.toList());
+            //찾은 퀴즈 아이디를 통해 선지 객체들을 쭉 가져와서, 각 선지의 텍스트를 하나씩 집어넣는다
+
+            QuizDetailResponse quizDetailResponse=new QuizDetailResponse(
+                    quiz.get().getQuizId(),
+                    quiz.get().getQuestion(),
+                    options,
+                    attempt.getChosenAnswer(),
+                    quiz.get().getCorrectAnswer()
+            );
+            //퀴즈 상세정보를 채운다
+            quizzes.add(quizDetailResponse);
+            //퀴즈상세정보 리스트에 추가한다 그리고 다음으로 넘어가 반복한다
+        }
+        //퀴즈 상세정보 리스트는 완성이 된 상태
 
 
+        /*Long userId,
+        String subjectName,
+        Integer interval,
+        String date,
+        List<QuizDetailResponse> quizzes,
+        Integer totalQuiz,
+        Integer correctAnswers*/
+
+            return new GetRecentQuizzesResponse(
+                    userId,
+
+            );
+        }
 
 
-        return (new GetRecentQuizzesResponse(userId));
-    }
-*/
     private Integer calculateStartingQuizId(Long summaryId, Integer dayInterval) {
         Integer baseQuizId = quizRepository.findFirstQuizIdBySummaryId(summaryId).intValue();
         if (baseQuizId == null) {

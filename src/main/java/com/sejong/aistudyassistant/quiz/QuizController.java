@@ -69,15 +69,15 @@ public class QuizController {
             return ResponseEntity.status(500).body(null);
         }
     }
-/*
+
     public ResponseEntity<GetRecentQuizzesResponse> getRecentQuizzes(@RequestHeader("Authorization") String authHeader,@RequestBody GetRecentQuizzesRequest quizzesRequest){
 
         String token = authHeader.replace("Bearer ", "");
         Long userId=jwtUtil.getUserIdFromToken(token);
         try {
-            return ResponseEntity.ok(quizService.getRecentQuizzes(userId);
+            return ResponseEntity.ok(quizService.getRecentQuizzes(userId));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }
-    }*/
+    }
 }

@@ -20,19 +20,6 @@ public class QuizController {
         this.jwtUtil=jwtUtil;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<Void> createQuiz(@RequestHeader("Authorization") String authHeader,@RequestBody CreateQuizRequest quizRequest) {
-        String token = authHeader.replace("Bearer ", "");
-        Long userId=jwtUtil.getUserIdFromToken(token);
-        try {
-            quizService.createQuizzes(quizRequest.lectureText(), quizRequest.summaryId(), userId);
-            return ResponseEntity.status(200).body(null);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-
-
     @GetMapping("/get")
     public ResponseEntity<List<GetQuizzesResponse>> getQuizzes(@RequestHeader("Authorization") String authHeader, @RequestBody GetQuizzesRequest quizRequest) {
 
@@ -70,15 +57,4 @@ public class QuizController {
         }
     }
 
-    @GetMapping("/recent")
-    public ResponseEntity<GetRecentQuizzesResponse> getRecentQuizzes(@RequestHeader("Authorization") String authHeader){
-
-        String token = authHeader.replace("Bearer ", "");
-        Long userId=jwtUtil.getUserIdFromToken(token);
-        try {
-            return ResponseEntity.ok(quizService.getRecentQuizzes(userId));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
 }

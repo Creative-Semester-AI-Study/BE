@@ -39,11 +39,19 @@ public class SummaryService {
                 .bodyToMono(Map.class)
                 .flatMap(response -> {
                     String rid = (String) response.get("rid");
-                    return pollForResult(rid, transcriptId);
+                    return pollForResult(rid, transcriptId, transcript.getUserId());
                 });
     }
 
-    private Mono<Summary> pollForResult(String rid, Long transcriptId) {
+    public Summary updateSummary(Long summaryId, String newSummaryText) {
+        Summary summary = summaryRepository.findById(summaryId)
+                .orElseThrow(() -> new RuntimeException("Summary not found with id: " + summaryId));
+
+        summary.setSummaryText(newSummaryText);
+        return summaryRepository.save(summary);
+    }
+
+    private Mono<Summary> pollForResult(String rid, Long transcriptId, Long userId) {
         return webClient.get()
                 .uri("/nlp/v1/async/minutes/{rid}", rid)
                 .retrieve()
@@ -71,13 +79,14 @@ public class SummaryService {
                         Summary summary = new Summary();
                         summary.setTranscriptId(transcriptId);
                         summary.setSummaryText(summaryTextBuilder.toString().trim()); // 최종 요약 텍스트 설정
-                        summaryRepository.save(summary);
+                        summary.setUserId(userId);
+                        Summary savedSummary = summaryRepository.save(summary);
 
-                        Long summaryId = summaryRepository.findByTranscriptId(transcriptId).getId();
+                        // Long summaryId = summaryRepository.findByTranscriptId(transcriptId).getId();
                         Transcript newTranscript = transcriptRepository.findById(transcriptId)
                                 .orElseThrow(() -> new IllegalArgumentException("Invalid transcript ID: " + transcriptId));
 
-                        newTranscript.setSummaryId(summaryId);
+                        newTranscript.setSummaryId(savedSummary.getId());
                         transcriptRepository.save(newTranscript);
 
 
@@ -85,7 +94,7 @@ public class SummaryService {
                         return Mono.just(summary);
                     } else {
                         return Mono.delay(Duration.ofSeconds(5))
-                                .flatMap(l -> pollForResult(rid, transcriptId));
+                                .flatMap(l -> pollForResult(rid, transcriptId, userId));
                     }
                 });
     }

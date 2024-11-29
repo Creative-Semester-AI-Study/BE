@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/study/Subject")
+@RequestMapping("/study/subject")
 public class SubjectController {
 
     @Autowired

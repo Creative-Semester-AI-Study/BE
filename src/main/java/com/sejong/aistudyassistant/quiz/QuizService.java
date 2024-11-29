@@ -8,10 +8,13 @@ import com.sejong.aistudyassistant.quiz.Entity.QuizOption;
 import com.sejong.aistudyassistant.quiz.Repository.QuizAttemptRepository;
 import com.sejong.aistudyassistant.quiz.Repository.QuizOptionRepository;
 import com.sejong.aistudyassistant.quiz.Repository.QuizRepository;
-import com.sejong.aistudyassistant.quiz.Repository.QuizStatisticsRepository;
 import com.sejong.aistudyassistant.quiz.dto.*;
+import com.sejong.aistudyassistant.stt.Transcript;
+import com.sejong.aistudyassistant.stt.TranscriptRepository;
 import com.sejong.aistudyassistant.subject.Subject;
 import com.sejong.aistudyassistant.subject.SubjectRepository;
+import com.sejong.aistudyassistant.summary.Summary;
+import com.sejong.aistudyassistant.summary.SummaryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -23,6 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,7 +41,8 @@ public class QuizService {
     private final QuizOptionRepository quizOptionRepository;
     private final SubjectRepository subjectRepository;
     private final QuizAttemptRepository quizAttemptRepository;
-    private final QuizStatisticsRepository quizStatisticsRepository;
+    private final SummaryRepository summaryRepository;
+    private final TranscriptRepository transcriptRepository;
     private final ProfileRepository profileRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -43,13 +50,16 @@ public class QuizService {
     @Value("${openai.api.key}")
     private String apiKey;
 
-    public QuizService(QuizRepository quizRepository,QuizOptionRepository quizOptionRepository,SubjectRepository subjectRepository,QuizAttemptRepository quizAttemptRepository,QuizStatisticsRepository quizStatisticsRepository,ProfileRepository profileRepository,JwtUtil jwtUtil) {
+    public QuizService(QuizRepository quizRepository,QuizOptionRepository quizOptionRepository,
+                       SubjectRepository subjectRepository,QuizAttemptRepository quizAttemptRepository, ProfileRepository profileRepository,
+                       JwtUtil jwtUtil,SummaryRepository summaryRepository, TranscriptRepository transcriptRepository) {
         this.quizRepository = quizRepository;
         this.quizOptionRepository=quizOptionRepository;
         this.subjectRepository=subjectRepository;
         this.quizAttemptRepository=quizAttemptRepository;
-        this.quizStatisticsRepository=quizStatisticsRepository;
         this.profileRepository=profileRepository;
+        this.summaryRepository=summaryRepository;
+        this.transcriptRepository=transcriptRepository;
         this.jwtUtil=jwtUtil;
         this.restTemplate = new RestTemplate();
         this.objectMapper = new ObjectMapper();
@@ -199,31 +209,20 @@ public class QuizService {
         return resultResponse;
     }
 
-    //최근 퀴즈 5개 가져오는 거
     public GetRecentQuizzesResponse getRecentQuizzes(Long userId){
-        //퀴즈 어템프트에서 가장 최근 저장된 애들 5개 가져오기
-        //퀴즈 아이디 5개 뽑아낸다음 퀴즈 리스트를 가져온다 (옵션 포함)
-        //틀린 여부도 같이 보내줘야 할 것 같은데..+본인이 뭐 선택했는지
-        //퀴즈 총 개수(5)랑 맞은 개수도 같이 반환
-        //여튼 퀴즈는 저렇게 묶어서 쫙 보내고
-        //요약문으로 과목 찾아서 과목 이름, 과목의 날짜 가져온 뒤 날짜로 회차 계산해서 반환
-        //씁 걍 퀴즈의 문제, 선지, 정답, 선택한 답, 몇 개 맞았는지 즉 퀴즈 관련된 애들을 dto로 따로 음...클래스로 만드는 게 나을 듯
 
         List<QuizAttempt> quizAttempt=quizAttemptRepository.findTop5ByOrderByQuizAttemptIdDesc();
-        //가장 최근 저장된 퀴즈 시도 객체 5개가 들어와있는 상태
-
         List<QuizDetailResponse> quizzes=new ArrayList<>();
-        //퀴즈 관련 정보들을 담기 위해서 빈 리스트를 만듦
+
+        String date=null;
+        Long findSummaryId=null;
 
         for (QuizAttempt attempt: quizAttempt){
             Optional<Quiz> quiz=quizRepository.findById(attempt.getQuizId());
-            //퀴즈시도객체에서 그에 해당하는 퀴즈를 찾아온다(정답, 질문, 요약본 아이디, 유저 아이디 존재)
-
             List<QuizOption> optionList=quizOptionRepository.findByQuizQuizId(quiz.get().getQuizId());
             List<String> options = optionList.stream()
                     .map(QuizOption::getOptionText)
                     .collect(Collectors.toList());
-            //찾은 퀴즈 아이디를 통해 선지 객체들을 쭉 가져와서, 각 선지의 텍스트를 하나씩 집어넣는다
 
             QuizDetailResponse quizDetailResponse=new QuizDetailResponse(
                     quiz.get().getQuizId(),
@@ -232,27 +231,50 @@ public class QuizService {
                     attempt.getChosenAnswer(),
                     quiz.get().getCorrectAnswer()
             );
-            //퀴즈 상세정보를 채운다
             quizzes.add(quizDetailResponse);
-            //퀴즈상세정보 리스트에 추가한다 그리고 다음으로 넘어가 반복한다
+            date=attempt.getAttemptDate();
+            findSummaryId=attempt.getSummaryId();
         }
-        //퀴즈 상세정보 리스트는 완성이 된 상태
 
-
-        /*Long userId,
-        String subjectName,
-        Integer interval,
-        String date,
-        List<QuizDetailResponse> quizzes,
-        Integer totalQuiz,
-        Integer correctAnswers*/
+        Optional<Summary> summary=summaryRepository.findById(findSummaryId);
+        Optional<Transcript> transcript=transcriptRepository.findById(summary.get().getTranscriptId());
+        Subject subject=transcript.get().getSubject();
+        Integer round=calculateRound(transcript.get().getCreatedAt(),LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                .atStartOfDay());
+        GetQuizResultResponse quizResultResponse=getQuizResult(userId,summary.get().getId(),subject.getId(),round);
+        Integer correctAnswers=quizResultResponse.correctAnswers();
 
             return new GetRecentQuizzesResponse(
                     userId,
-
+                    subject.getSubjectName(),
+                    round,
+                    date,
+                    quizzes,
+                    5,
+                    correctAnswers
             );
         }
 
+    private Integer calculateRound(LocalDateTime createdDate, LocalDateTime reviewDate){
+        Long difference=ChronoUnit.DAYS.between(createdDate,reviewDate);
+        Integer interval=difference.intValue();
+        switch (interval){
+            case 0:
+                return 1;
+            case 1:
+                return 2;
+            case 3:
+                return 3;
+            case 7:
+                return 4;
+            case 15:
+                return 5;
+            case 30:
+                return 6;
+            default:
+                throw new IllegalArgumentException("잘못된 회차입니다: " + interval);
+        }
+    }
 
     private Integer calculateStartingQuizId(Long summaryId, Integer dayInterval) {
         Integer baseQuizId = quizRepository.findFirstQuizIdBySummaryId(summaryId).intValue();

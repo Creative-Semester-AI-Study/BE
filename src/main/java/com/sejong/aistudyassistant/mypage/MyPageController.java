@@ -2,18 +2,14 @@ package com.sejong.aistudyassistant.mypage;
 
 import com.sejong.aistudyassistant.jwt.JwtUtil;
 import com.sejong.aistudyassistant.stt.TranscriptDTO;
-import com.sejong.aistudyassistant.stt.TranscriptionService;
-import com.sejong.aistudyassistant.subject.dto.DeleteSubjectResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/study/myPage")
@@ -49,3 +45,5 @@ public class MyPageController {
         return ResponseEntity.ok(transcripts);
     }
 }
+
+

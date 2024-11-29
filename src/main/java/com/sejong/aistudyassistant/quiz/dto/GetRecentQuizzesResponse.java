@@ -6,7 +6,7 @@ public record GetRecentQuizzesResponse (
 
         Long userId,
         String subjectName,
-        Integer interval,
+        Integer round,
         String date,
         List<QuizDetailResponse> quizzes,
         Integer totalQuiz,

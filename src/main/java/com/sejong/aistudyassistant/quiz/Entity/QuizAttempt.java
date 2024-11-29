@@ -29,6 +29,8 @@ public class QuizAttempt {
 
     private String attemptDate;
 
+    private String chosenAnswer;
+
     private Boolean correct=false;
 
 }

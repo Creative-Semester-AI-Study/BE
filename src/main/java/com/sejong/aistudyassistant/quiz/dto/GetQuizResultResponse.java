@@ -1,6 +1,6 @@
 package com.sejong.aistudyassistant.quiz.dto;
 
-public record GetLearningResultResponse (
+public record GetQuizResultResponse(
         Long userId,
         Long summaryId,
         String date,

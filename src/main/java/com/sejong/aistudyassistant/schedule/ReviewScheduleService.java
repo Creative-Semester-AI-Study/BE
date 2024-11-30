@@ -32,21 +32,32 @@ public class ReviewScheduleService {
         List<ReviewScheduleDTO> reviewSchedules = new ArrayList<>();
         int[] dayIntervals = {1, 3, 7, 15, 30};
 
-        // 하루 전체를 커버하기 위해 LocalDate를 LocalDateTime으로 변환
-        LocalDateTime startOfDate = date.atStartOfDay(); // 해당 날짜의 시작 시간 (00:00)
-        LocalDateTime endOfDate = date.atTime(23, 59, 59); // 해당 날짜의 끝 시간 (23:59)
+        LocalDateTime startOfDate = date.atStartOfDay();
+        LocalDateTime endOfDate = date.atTime(23, 59, 59);
 
         for (int dayInterval : dayIntervals) {
-            // 타겟 날짜의 시작과 끝 시간을 계산
             LocalDateTime targetStartDate = startOfDate.minusDays(dayInterval);
             LocalDateTime targetEndDate = endOfDate.minusDays(dayInterval);
 
-            // 리포지토리 메서드 업데이트 필요: findByUserIdAndCreatedAtBetween 사용
             List<Transcript> transcripts = transcriptRepository.findByUserIdAndCreatedAtBetween(userId, targetStartDate, targetEndDate);
-            List<ReviewScheduleDTO> periodReviews = transcripts.stream()
-                    .map(transcript -> createReviewScheduleDTO(userId, transcript, dayInterval, date))
-                    .collect(Collectors.toList());
-            reviewSchedules.addAll(periodReviews);
+
+            for (Transcript transcript : transcripts) {
+                ReviewScheduleDTO dto = createReviewScheduleDTO(userId, transcript, dayInterval, date);
+
+                // 과목별 통계 갱신
+                Subject subject = subjectRepository.findByUserIdAndId(userId, transcript.getSubject().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Subject not found"));
+
+                subject.incrementTotalReviews();
+                if (dto.isReviewed()) {
+                    subject.incrementCompletedReviews();
+                }
+
+                // 갱신된 Subject를 저장
+                subjectRepository.save(subject);
+
+                reviewSchedules.add(dto);
+            }
         }
         return reviewSchedules;
     }
@@ -108,34 +119,5 @@ public class ReviewScheduleService {
                             && attemptDate.isBefore(targetEndDate.plusDays(1));
                 });
     }
-
-
-    public List<SubjectStatsDTO> getAllSubjectsStats(Long userId) {
-        // 모든 과목(subject) 조회
-        List<Subject> subjects = subjectRepository.findAllByUserId(userId);
-
-        List<SubjectStatsDTO> subjectStatsList = new ArrayList<>();
-        for (Subject subject : subjects) {
-            // 특정 과목의 복습 스케줄 조회
-            List<ReviewScheduleDTO> reviewSchedules = findReviewsForSubject(userId, subject.getId());
-            // 복습 완료 수와 총 복습 스케줄 수를 계산
-            long reviewedCount = reviewSchedules.stream().filter(ReviewScheduleDTO::isReviewed).count();
-            int totalReviews = reviewSchedules.size();
-            int reviewPercentage = totalReviews > 0 ? (int) ((reviewedCount * 100) / totalReviews) : 0;
-
-            // 과목별 복습도 DTO 생성
-            SubjectStatsDTO subjectStatsDTO = new SubjectStatsDTO(
-                    subject.getId(),
-                    subject.getSubjectName(),
-                    totalReviews,
-                    (int) reviewedCount,
-                    reviewPercentage
-            );
-            subjectStatsList.add(subjectStatsDTO);
-        }
-        return subjectStatsList;
-    }
-
-
 }
 

@@ -4,18 +4,17 @@ public class SubjectStatsDTO {
     private Long subjectId;
     private String subjectName;
     private int totalReviews;
-    private int reviewedCount;
-    private int reviewPercentage;
+    private int completedReviews;
+    private int reviewRate;
 
-    public SubjectStatsDTO(Long subjectId, String subjectName, int totalReviews, int reviewedCount, int reviewPercentage) {
+    public SubjectStatsDTO(Long subjectId, String subjectName, int totalReviews, int completedReviews, int reviewRate) {
         this.subjectId = subjectId;
         this.subjectName = subjectName;
         this.totalReviews = totalReviews;
-        this.reviewedCount = reviewedCount;
-        this.reviewPercentage = reviewPercentage;
+        this.completedReviews = completedReviews;
+        this.reviewRate = reviewRate;
     }
 
-    // Getters and Setters
     public Long getSubjectId() {
         return subjectId;
     }
@@ -40,19 +39,19 @@ public class SubjectStatsDTO {
         this.totalReviews = totalReviews;
     }
 
-    public int getReviewedCount() {
-        return reviewedCount;
+    public int getCompletedReviews() {
+        return completedReviews;
     }
 
-    public void setReviewedCount(int reviewedCount) {
-        this.reviewedCount = reviewedCount;
+    public void setCompletedReviews(int completedReviews) {
+        this.completedReviews = completedReviews;
     }
 
-    public int getReviewPercentage() {
-        return reviewPercentage;
+    public int getReviewRate() {
+        return reviewRate;
     }
 
-    public void setReviewPercentage(int reviewPercentage) {
-        this.reviewPercentage = reviewPercentage;
+    public void setReviewRate(int reviewRate) {
+        this.reviewRate = reviewRate;
     }
 }

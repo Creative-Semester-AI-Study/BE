@@ -23,6 +23,7 @@ public class MonthStatsController {
         this.jwtUtil = jwtUtil;
     }
 
+    //이번년도 달에 대해서만 통계를 냄
     @GetMapping
     public ResponseEntity<MonthStatsDTO> getMonthReviewStats(
             @RequestHeader("Authorization") String authHeader,
@@ -44,7 +45,7 @@ public class MonthStatsController {
         int monthCompletedReviews = 0;
         int monthReviewPercentage = 0;
 
-        // 해당 월의 모든 날짜에 대해 반복
+        // 이번년도 특정 월의 모든 날짜에 대해 총 통계의 수 세고, 복습 완료한 개수를 셈
         for (LocalDate date = startOfMonth; !date.isAfter(endOfMonth); date = date.plusDays(1)) {
             List<ReviewScheduleDTO> dailySchedules = reviewScheduleService.findReviewsForDate(userId, date);
             monthTotalReviews += dailySchedules.size();

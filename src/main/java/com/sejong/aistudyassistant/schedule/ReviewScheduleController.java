@@ -1,15 +1,11 @@
 package com.sejong.aistudyassistant.schedule;
 
 import com.sejong.aistudyassistant.jwt.JwtUtil;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -23,14 +19,17 @@ public class ReviewScheduleController {
         this.jwtUtil = jwtUtil;
     }
 
-    @GetMapping
+    @GetMapping("/{date}")
     public ResponseEntity<List<ReviewScheduleDTO>> getReviewSchedules(
             @RequestHeader("Authorization") String authHeader,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        String token = authHeader.replace("Bearer ", "");  // 헤더에서 토큰을 추출합니다.
-        Long userId = jwtUtil.getUserIdFromToken(token);  // 토큰에서 사용자 ID를 추출합니다.
+            @PathVariable String date) {  // 날짜를 경로에서 받음
+        String token = authHeader.replace("Bearer ", "");  // 헤더에서 토큰 추출
+        Long userId = jwtUtil.getUserIdFromToken(token);  // 토큰에서 사용자 ID 추출
 
-        List<ReviewScheduleDTO> schedules = reviewScheduleService.findReviewsForDate(userId, date);
+        // URL 경로에서 받은 날짜 문자열을 LocalDate로 변환
+        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
+
+        List<ReviewScheduleDTO> schedules = reviewScheduleService.findReviewsForDate(userId, localDate);
         return ResponseEntity.ok(schedules);
     }
 }

@@ -46,7 +46,7 @@ public class ReviewScheduleService {
         return reviewSchedules;
     }
 
-
+    //날짜 date 기준으로 date의 reviewed 여부 조회해서 date의 복습 DTO 생성
     private ReviewScheduleDTO createReviewScheduleDTO(Long userId, Transcript transcript, int dayInterval, LocalDate date) {
         Long summaryId = transcript.getSummaryId();
         String subjectName = transcript.getSubject().getSubjectName();

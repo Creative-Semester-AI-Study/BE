@@ -2,8 +2,11 @@ package com.sejong.aistudyassistant.schedule;
 
 import com.sejong.aistudyassistant.quiz.Entity.QuizAttempt;
 import com.sejong.aistudyassistant.quiz.Repository.QuizAttemptRepository;
+import com.sejong.aistudyassistant.stats.SubjectStatsDTO;
 import com.sejong.aistudyassistant.stt.Transcript;
 import com.sejong.aistudyassistant.stt.TranscriptRepository;
+import com.sejong.aistudyassistant.subject.Subject;
+import com.sejong.aistudyassistant.subject.SubjectRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,10 +20,12 @@ import java.util.stream.Collectors;
 public class ReviewScheduleService {
     private final TranscriptRepository transcriptRepository;
     private final QuizAttemptRepository quizAttemptRepository;
+    private final SubjectRepository subjectRepository;
 
-    public ReviewScheduleService(TranscriptRepository transcriptRepository, QuizAttemptRepository quizAttemptRepository) {
+    public ReviewScheduleService(TranscriptRepository transcriptRepository, QuizAttemptRepository quizAttemptRepository, SubjectRepository subjectRepository) {
         this.transcriptRepository = transcriptRepository;
         this.quizAttemptRepository = quizAttemptRepository;
+        this.subjectRepository = subjectRepository;
     }
 
     public List<ReviewScheduleDTO> findReviewsForDate(Long userId, LocalDate date) {
@@ -102,6 +107,33 @@ public class ReviewScheduleService {
                     return attemptDate.isAfter(targetStartDate)
                             && attemptDate.isBefore(targetEndDate.plusDays(1));
                 });
+    }
+
+
+    public List<SubjectStatsDTO> getAllSubjectsStats(Long userId) {
+        // 모든 과목(subject) 조회
+        List<Subject> subjects = subjectRepository.findAllByUserId(userId);
+
+        List<SubjectStatsDTO> subjectStatsList = new ArrayList<>();
+        for (Subject subject : subjects) {
+            // 특정 과목의 복습 스케줄 조회
+            List<ReviewScheduleDTO> reviewSchedules = findReviewsForSubject(userId, subject.getId());
+            // 복습 완료 수와 총 복습 스케줄 수를 계산
+            long reviewedCount = reviewSchedules.stream().filter(ReviewScheduleDTO::isReviewed).count();
+            int totalReviews = reviewSchedules.size();
+            int reviewPercentage = totalReviews > 0 ? (int) ((reviewedCount * 100) / totalReviews) : 0;
+
+            // 과목별 복습도 DTO 생성
+            SubjectStatsDTO subjectStatsDTO = new SubjectStatsDTO(
+                    subject.getId(),
+                    subject.getSubjectName(),
+                    totalReviews,
+                    (int) reviewedCount,
+                    reviewPercentage
+            );
+            subjectStatsList.add(subjectStatsDTO);
+        }
+        return subjectStatsList;
     }
 
 

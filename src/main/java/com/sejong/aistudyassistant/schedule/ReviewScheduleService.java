@@ -44,9 +44,15 @@ public class ReviewScheduleService {
             for (Transcript transcript : transcripts) {
                 ReviewScheduleDTO dto = createReviewScheduleDTO(userId, transcript, dayInterval, date);
 
-                // 과목별 통계 갱신
+                // Subject 조회
                 Subject subject = subjectRepository.findByUserIdAndId(userId, transcript.getSubject().getId())
-                        .orElseThrow(() -> new IllegalArgumentException("Subject not found"));
+                        .orElse(null); // Subject가 없을 경우 null 반환
+
+                if (subject == null) {
+                    // 로그 추가 및 건너뛰기
+                    System.err.println("Subject not found for User ID: " + userId + " and Subject ID: " + transcript.getSubject().getId());
+                    continue;
+                }
 
                 subject.incrementTotalReviews();
                 if (dto.isReviewed()) {

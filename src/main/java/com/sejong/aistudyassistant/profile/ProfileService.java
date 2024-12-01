@@ -1,7 +1,6 @@
 package com.sejong.aistudyassistant.profile;
 
 import com.sejong.aistudyassistant.login.Entity.User;
-import com.sejong.aistudyassistant.login.Repository.UserRepository;
 import com.sejong.aistudyassistant.mypage.MyPage;
 import com.sejong.aistudyassistant.mypage.MyPageRepository;
 import com.sejong.aistudyassistant.profile.dto.ProfileResponse;
@@ -41,6 +40,7 @@ public class ProfileService {
         profile.setStudentName(user.getName());
         // 프로필 이미지 설정 로직이 있다면 추가하세요
 
+
         Profile savedProfile = profileRepository.save(profile);
         logger.info("Profile created successfully with ID: {}", savedProfile.getProfileId());
 
@@ -59,8 +59,7 @@ public class ProfileService {
                         profile.getProfileId(),
                         profile.getUserId(),
                         profile.getStudentId(),
-                        profile.getStudentName(),
-                        profile.getProfileImage()
+                        profile.getStudentName()
                 ));
     }
 }

@@ -3,6 +3,7 @@ package com.sejong.aistudyassistant.subject;
 import com.sejong.aistudyassistant.mypage.MyPage;
 import com.sejong.aistudyassistant.mypage.MyPageRepository;
 import com.sejong.aistudyassistant.profile.ProfileRepository;
+
 import com.sejong.aistudyassistant.subject.dto.*;
 
 import jakarta.transaction.Transactional;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -59,6 +61,7 @@ public class SubjectService {
     }
 
     @Transactional
+
     public CreateSubjectResponse createSubject(CreateSubjectRequest request, Long userId) {
         Subject newSubject = new Subject();
 

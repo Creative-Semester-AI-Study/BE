@@ -44,6 +44,31 @@ public class Subject {
 
     private Long userId;
 
+//    // 복습 통계 필드 추가
+//    private int totalReviews = 0; // 전체 복습 개수
+//    private int completedReviews = 0; // 완료한 복습 개수
+//    private double reviewRate = 0.0; // 복습도 (완료한 복습 개수 / 전체 복습 개수)
+
+//    // 통계 갱신 메서드
+//    public void incrementTotalReviews() {
+//        this.totalReviews++;
+//        updateReviewRate();
+//    }
+//
+//    public void incrementCompletedReviews() {
+//        this.completedReviews++;
+//        updateReviewRate();
+//    }
+//
+//    public void updateReviewRate() {
+//        if (totalReviews > 0) {
+//            this.reviewRate = ((double) completedReviews / totalReviews) * 100;
+//        } else {
+//            this.reviewRate = 0.0;
+//        }
+//    }
+
+
     public Long getUserId() {
         return userId;
     }
@@ -100,4 +125,16 @@ public class Subject {
     public void setDays(String days) {
         this.days = days;
     }
+
+//    public int getTotalReviews() {
+//        return totalReviews;
+//    }
+//
+//    public int getCompletedReviews() {
+//        return completedReviews;
+//    }
+//
+//    public double getReviewRate() {
+//        return reviewRate;
+//    }
 }

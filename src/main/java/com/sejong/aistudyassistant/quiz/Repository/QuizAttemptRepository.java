@@ -15,4 +15,7 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt,Long> {
 
     //복습 여부 구하기 위해 조회
     List<QuizAttempt> findByUserIdAndSummaryId(Long userId, Long summaryId); // summaryId로 QuizAttempt 조회
+
+    List<QuizAttempt> findTop5ByOrderByQuizAttemptIdDesc();
+
 }

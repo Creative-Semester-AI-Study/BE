@@ -8,10 +8,13 @@ import com.sejong.aistudyassistant.quiz.Entity.QuizOption;
 import com.sejong.aistudyassistant.quiz.Repository.QuizAttemptRepository;
 import com.sejong.aistudyassistant.quiz.Repository.QuizOptionRepository;
 import com.sejong.aistudyassistant.quiz.Repository.QuizRepository;
-import com.sejong.aistudyassistant.quiz.Repository.QuizStatisticsRepository;
 import com.sejong.aistudyassistant.quiz.dto.*;
+import com.sejong.aistudyassistant.stt.Transcript;
+import com.sejong.aistudyassistant.stt.TranscriptRepository;
 import com.sejong.aistudyassistant.subject.Subject;
 import com.sejong.aistudyassistant.subject.SubjectRepository;
+import com.sejong.aistudyassistant.summary.Summary;
+import com.sejong.aistudyassistant.summary.SummaryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -23,10 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +41,8 @@ public class QuizService {
     private final QuizOptionRepository quizOptionRepository;
     private final SubjectRepository subjectRepository;
     private final QuizAttemptRepository quizAttemptRepository;
-    private final QuizStatisticsRepository quizStatisticsRepository;
+    private final SummaryRepository summaryRepository;
+    private final TranscriptRepository transcriptRepository;
     private final ProfileRepository profileRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -46,13 +50,16 @@ public class QuizService {
     @Value("${openai.api.key}")
     private String apiKey;
 
-    public QuizService(QuizRepository quizRepository,QuizOptionRepository quizOptionRepository,SubjectRepository subjectRepository,QuizAttemptRepository quizAttemptRepository,QuizStatisticsRepository quizStatisticsRepository,ProfileRepository profileRepository,JwtUtil jwtUtil) {
+    public QuizService(QuizRepository quizRepository,QuizOptionRepository quizOptionRepository,
+                       SubjectRepository subjectRepository,QuizAttemptRepository quizAttemptRepository, ProfileRepository profileRepository,
+                       JwtUtil jwtUtil,SummaryRepository summaryRepository, TranscriptRepository transcriptRepository) {
         this.quizRepository = quizRepository;
         this.quizOptionRepository=quizOptionRepository;
         this.subjectRepository=subjectRepository;
         this.quizAttemptRepository=quizAttemptRepository;
-        this.quizStatisticsRepository=quizStatisticsRepository;
         this.profileRepository=profileRepository;
+        this.summaryRepository=summaryRepository;
+        this.transcriptRepository=transcriptRepository;
         this.jwtUtil=jwtUtil;
         this.restTemplate = new RestTemplate();
         this.objectMapper = new ObjectMapper();
@@ -131,29 +138,14 @@ public class QuizService {
         }
     }
 
+    public List<GetQuizzesResponse> getQuizzes(Long userId, Long summaryId, Integer dayInterval){
 
-    List<GetLearningQuizResponse> getLearningQuiz(Long userId, Long summaryId){
+        List<GetQuizzesResponse> quizList=new ArrayList<>();
 
-        List<GetLearningQuizResponse> quizList=new ArrayList<>();
-        List<Quiz> quizzes=quizRepository.findTop5ByUserIdAndSummaryIdOrderByQuizId(userId,summaryId);
+        if(dayInterval==null)
+            dayInterval=0;
 
-        for(Quiz quiz: quizzes){
-            Long quizId=quiz.getQuizId();
-            String question=quiz.getQuestion();
-            List<QuizOption> optionList=quizOptionRepository.findByQuizQuizId(quizId);
-            List<String> options = optionList.stream()
-                    .map(QuizOption::getOptionText)
-                    .collect(Collectors.toList());
-            GetLearningQuizResponse responseDTO=new GetLearningQuizResponse(quizId,question,options);
-            quizList.add(responseDTO);
-        }
-        return quizList;
-    }
-
-    public List<GetReviewQuizResponse> getReviewQuiz(Long userId, Long summaryId, Integer dayInterval){
-
-        List<GetReviewQuizResponse> quizList=new ArrayList<>();
-        Long startId = calculateStartingQuizId(dayInterval).longValue();
+        Long startId = calculateStartingQuizId(summaryId,dayInterval).longValue();
         List<Quiz> quizzes=quizRepository.findByUserIdAndSummaryIdAndQuizIdBetween(userId, summaryId, startId,startId+4);
 
         for(Quiz quiz: quizzes){
@@ -163,7 +155,7 @@ public class QuizService {
             List<String> options = optionList.stream()
                     .map(QuizOption::getOptionText)
                     .collect(Collectors.toList());
-            GetReviewQuizResponse responseDTO=new GetReviewQuizResponse(quizId,question,options);
+            GetQuizzesResponse responseDTO=new GetQuizzesResponse(quizId,question,options);
             quizList.add(responseDTO);
         }
         return quizList;
@@ -178,6 +170,7 @@ public class QuizService {
         quizAttempt.setUserId(userId);
         quizAttempt.setSummaryId(summaryId);
         quizAttempt.setAttemptDate(LocalDate.now().toString());
+        quizAttempt.setChosenAnswer(answer);
 
         if(answer.equals(quiz.get().getCorrectAnswer())){
             quizAttempt.setCorrect(true);
@@ -198,9 +191,11 @@ public class QuizService {
         return quizResponse;
     }
 
-    public GetLearningResultResponse getLearningResult(Long userId, Long summaryId,Long subjectId){
+    public GetQuizResultResponse getQuizResult(Long userId, Long summaryId, Long subjectId, Integer dayInterval){
 
-        List<QuizAttempt> quizList=quizAttemptRepository.findByUserIdAndSummaryIdAndQuizIdBetween(userId,summaryId,1L,5L);
+        Long startId=calculateStartingQuizId(summaryId,dayInterval).longValue();
+
+        List<QuizAttempt> quizList=quizAttemptRepository.findByUserIdAndSummaryIdAndQuizIdBetween(userId,summaryId,startId,startId+4);
         int correctAnswers=0;
 
         for(QuizAttempt quiz: quizList){
@@ -210,23 +205,95 @@ public class QuizService {
         Optional<Subject> subject=subjectRepository.findById(subjectId);
         QuizAttempt quizAttempt=quizAttemptRepository.findByQuizId(1L);
 
-        GetLearningResultResponse resultResponse=new GetLearningResultResponse(userId, summaryId,quizAttempt.getAttemptDate(),subject.get().getSubjectName(),5,correctAnswers);
+        GetQuizResultResponse resultResponse=new GetQuizResultResponse(userId, summaryId,quizAttempt.getAttemptDate(),subject.get().getSubjectName(),5,correctAnswers);
         return resultResponse;
     }
 
-    private Integer calculateStartingQuizId(Integer dayInterval){
+    public GetRecentQuizzesResponse getRecentQuizzes(Long userId){
 
-        switch (dayInterval){
+        List<QuizAttempt> quizAttempt=quizAttemptRepository.findTop5ByOrderByQuizAttemptIdDesc();
+        List<QuizDetailResponse> quizzes=new ArrayList<>();
+
+        String date=null;
+        Long findSummaryId=null;
+
+        for (QuizAttempt attempt: quizAttempt){
+            Optional<Quiz> quiz=quizRepository.findById(attempt.getQuizId());
+            List<QuizOption> optionList=quizOptionRepository.findByQuizQuizId(quiz.get().getQuizId());
+            List<String> options = optionList.stream()
+                    .map(QuizOption::getOptionText)
+                    .collect(Collectors.toList());
+
+            QuizDetailResponse quizDetailResponse=new QuizDetailResponse(
+                    quiz.get().getQuizId(),
+                    quiz.get().getQuestion(),
+                    options,
+                    attempt.getChosenAnswer(),
+                    quiz.get().getCorrectAnswer()
+            );
+            quizzes.add(quizDetailResponse);
+            date=attempt.getAttemptDate();
+            findSummaryId=attempt.getSummaryId();
+        }
+
+        Optional<Summary> summary=summaryRepository.findById(findSummaryId);
+        Optional<Transcript> transcript=transcriptRepository.findById(summary.get().getTranscriptId());
+        Subject subject=transcript.get().getSubject();
+        Integer round=calculateRound(transcript.get().getCreatedAt(),LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                .atStartOfDay());
+        GetQuizResultResponse quizResultResponse=getQuizResult(userId,summary.get().getId(),subject.getId(),round);
+        Integer correctAnswers=quizResultResponse.correctAnswers();
+
+            return new GetRecentQuizzesResponse(
+                    userId,
+                    subject.getSubjectName(),
+                    round,
+                    date,
+                    quizzes,
+                    5,
+                    correctAnswers
+            );
+        }
+
+    private Integer calculateRound(LocalDateTime createdDate, LocalDateTime reviewDate){
+        Long difference=ChronoUnit.DAYS.between(createdDate,reviewDate);
+        Integer interval=difference.intValue();
+        switch (interval){
+            case 0:
+                return 1;
             case 1:
-                return 6;
+                return 2;
             case 3:
-                return 11;
+                return 3;
             case 7:
-                return 16;
+                return 4;
             case 15:
-                return 21;
+                return 5;
             case 30:
-                return 26;
+                return 6;
+            default:
+                throw new IllegalArgumentException("잘못된 회차입니다: " + interval);
+        }
+    }
+
+    private Integer calculateStartingQuizId(Long summaryId, Integer dayInterval) {
+        Integer baseQuizId = quizRepository.findFirstQuizIdBySummaryId(summaryId).intValue();
+        if (baseQuizId == null) {
+            throw new IllegalArgumentException("해당 요약문에 대한 퀴즈가 존재하지 않습니다: " + summaryId);
+        }
+        switch (dayInterval) {
+            case 0:
+                return baseQuizId;
+            case 1:
+                return baseQuizId + 5;
+            case 3:
+                return baseQuizId + 10;
+            case 7:
+                return baseQuizId + 15;
+            case 15:
+                return baseQuizId + 20;
+            case 30:
+                return baseQuizId + 25;
             default:
                 throw new IllegalArgumentException("잘못된 주기입니다: " + dayInterval);
         }

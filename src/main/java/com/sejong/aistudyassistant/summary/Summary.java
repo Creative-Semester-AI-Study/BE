@@ -22,6 +22,16 @@ public class Summary {
     @Column(columnDefinition = "TEXT")
     private String summaryText;
 
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    private Long userId;
+
     public Long getTranscriptId() {
         return transcriptId;
     }

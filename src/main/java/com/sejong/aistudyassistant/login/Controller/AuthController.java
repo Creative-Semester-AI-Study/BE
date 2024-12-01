@@ -70,11 +70,17 @@ public class AuthController {
                     if (findUser != null) {
                         log.info("User found: {}", findUser);
                     } else {
-                        // User 저장
+                        log.info("User not found. Saving new user from response.");
                         userService.saveUserFromJsonResponse(responseBody, userId);
-                        log.info("User created: {}", findUser);
+                        findUser = userService.findUser(userId); // 저장 후 다시 조회
+                        if (findUser == null) {
+                            log.error("Failed to retrieve user after saving. Aborting operation.");
+                            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                        }
+                        log.info("User created and retrieved: {}", findUser);
+
                         // Profile 생성 (User가 저장된 이후에 실행)
-                       profileService.createProfile(findUser);
+                        profileService.createProfile(findUser);
                     }
 
                     // JWT 토큰 생성
@@ -90,9 +96,7 @@ public class AuthController {
                     userInfoMap.put("grade", grade);
                     userInfoMap.put("status", status);
 
-                    //프로필 데이터 추가
-                    profileService.createProfile(findUser);
-                    //Profile 정보 추가 (생성된 프로필 조회)
+                    // Profile 정보 추가 (생성된 프로필 조회)
                     ProfileResponse profile = profileService.getProfileByUserId(findUser.getUserId()).orElse(null);
                     if (profile != null) {
                         userInfoMap.put("profile", profile);
@@ -107,12 +111,10 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("An error occurred during login: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
 
     @GetMapping("/{userId}/getUserInfo")
     public ResponseEntity<String> getuserinfo(@PathVariable String userId) throws JsonProcessingException {

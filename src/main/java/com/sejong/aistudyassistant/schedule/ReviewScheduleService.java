@@ -43,30 +43,12 @@ public class ReviewScheduleService {
 
             for (Transcript transcript : transcripts) {
                 ReviewScheduleDTO dto = createReviewScheduleDTO(userId, transcript, dayInterval, date);
-
-                // Subject 조회
-                Subject subject = subjectRepository.findByUserIdAndId(userId, transcript.getSubject().getId())
-                        .orElse(null); // Subject가 없을 경우 null 반환
-
-                if (subject == null) {
-                    // 로그 추가 및 건너뛰기
-                    System.err.println("Subject not found for User ID: " + userId + " and Subject ID: " + transcript.getSubject().getId());
-                    continue;
-                }
-
-                subject.incrementTotalReviews();
-                if (dto.isReviewed()) {
-                    subject.incrementCompletedReviews();
-                }
-
-                // 갱신된 Subject를 저장
-                subjectRepository.save(subject);
-
                 reviewSchedules.add(dto);
             }
         }
         return reviewSchedules;
     }
+
 
     //날짜 date 기준으로 date의 reviewed 여부 조회해서 date의 복습 DTO 생성
     private ReviewScheduleDTO createReviewScheduleDTO(Long userId, Transcript transcript, int dayInterval, LocalDate date) {
@@ -124,6 +106,28 @@ public class ReviewScheduleService {
                     return attemptDate.isAfter(targetStartDate)
                             && attemptDate.isBefore(targetEndDate.plusDays(1));
                 });
+    }
+
+    public void updateSubjectStatistics(Long userId, List<ReviewScheduleDTO> schedules) {
+        for (ReviewScheduleDTO dto : schedules) {
+            // Subject 조회
+            Subject subject = subjectRepository.findByUserIdAndId(userId, dto.getSummaryId())
+                    .orElse(null);
+
+            if (subject == null) {
+                System.err.println("Subject not found for User ID: " + userId + " and Summary ID: " + dto.getSummaryId());
+                continue;
+            }
+
+            // 통계 갱신
+            subject.incrementTotalReviews();
+            if (dto.isReviewed()) {
+                subject.incrementCompletedReviews();
+            }
+
+            // 갱신된 Subject 저장
+            subjectRepository.save(subject);
+        }
     }
 }
 

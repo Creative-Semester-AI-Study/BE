@@ -82,6 +82,41 @@ public class StatsController {
         return ResponseEntity.ok(stats);
     }
 
+    // 모든 과목의 전체 복습 통계를 갱신하고 반환
+    @GetMapping("/subjects/total")
+    public ResponseEntity<List<SubjectStatsDTO>> updateAndGetTotalStats(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+
+        // 오늘의 복습 스케줄 가져오기
+        LocalDate today = LocalDate.now();
+        List<ReviewScheduleDTO> schedules = reviewScheduleService.findReviewsForDate(userId, today);
+
+        // 각 과목의 TotalReviews 갱신
+        for (ReviewScheduleDTO schedule : schedules) {
+            Subject subject = subjectRepository.findByUserIdAndId(userId, schedule.getSummaryId())
+                    .orElse(null);
+            if (subject != null) {
+                subject.incrementTotalReviews();
+                subjectRepository.save(subject);
+            }
+        }
+
+        // 모든 과목의 통계 반환
+        List<Subject> subjects = subjectRepository.findAllByUserId(userId);
+        List<SubjectStatsDTO> statsList = subjects.stream()
+                .map(subject -> new SubjectStatsDTO(
+                        subject.getId(),
+                        subject.getSubjectName(),
+                        subject.getTotalReviews(),
+                        subject.getCompletedReviews(),
+                        (int) Math.round(subject.getReviewRate())
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(statsList);
+    }
+
 
 
     // 모든 과목의 복습 통계

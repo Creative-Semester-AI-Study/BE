@@ -5,7 +5,7 @@ import com.sejong.aistudyassistant.quiz.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
+import com.sejong.aistudyassistant.quiz.QuizService;
 import java.util.List;
 
 @RestController

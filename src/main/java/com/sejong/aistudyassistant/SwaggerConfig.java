@@ -14,3 +14,5 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 }
 
+//주소 http://localhost:8080/swagger-ui/index.html
+

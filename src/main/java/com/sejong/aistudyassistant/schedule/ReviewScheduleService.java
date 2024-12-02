@@ -108,29 +108,28 @@ public class ReviewScheduleService {
                 });
     }
 
-//과목이 생성된 날부터 매일 복습 스케줄을 조회해서 과목 통계를 매일 새롭게 조회해서 반화하는 방법.
-//과목의 전체복습 완료한복습을 DB에 저장하면 새롬게 조회해서 더할 때 새롭게 더하는 데이터가 이전에 더한 전체복습 데이터인지 중복을 확인하는 방법이 없었음.
-//과목
-//    public void updateSubjectStatistics(Long userId, List<ReviewScheduleDTO> schedules) {
-//        for (ReviewScheduleDTO dto : schedules) {
-//            // Subject 조회
-//            Subject subject = subjectRepository.findByUserIdAndId(userId, dto.getSummaryId())
-//                    .orElse(null);
-//
-//            if (subject == null) {
-//                System.err.println("Subject not found for User ID: " + userId + " and Summary ID: " + dto.getSummaryId());
-//                continue;
-//            }
-//
-//            // 통계 갱신
-//            subject.incrementTotalReviews();
-//            if (dto.isReviewed()) {
-//                subject.incrementCompletedReviews();
-//            }
-//
-//            // 갱신된 Subject 저장
-//            subjectRepository.save(subject);
-//        }
-//    }
+    /*
+    public void updateSubjectStatistics(Long userId, List<ReviewScheduleDTO> schedules) {
+        for (ReviewScheduleDTO dto : schedules) {
+            // Subject 조회
+            Subject subject = subjectRepository.findByUserIdAndId(userId, dto.getSummaryId())
+                    .orElse(null);
+
+            if (subject == null) {
+                System.err.println("Subject not found for User ID: " + userId + " and Summary ID: " + dto.getSummaryId());
+                continue;
+            }
+
+            // 통계 갱신
+            subject.incrementTotalReviews();
+            if (dto.isReviewed()) {
+                subject.incrementCompletedReviews();
+            }
+
+            // 갱신된 Subject 저장
+            subjectRepository.save(subject);
+        }
+    }
+    */
 }
 

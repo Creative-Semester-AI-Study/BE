@@ -5,10 +5,10 @@ import com.sejong.aistudyassistant.quiz.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
+import com.sejong.aistudyassistant.quiz.QuizService;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/quiz")
 public class QuizController {
 
@@ -18,6 +18,18 @@ public class QuizController {
     public QuizController(QuizService quizService,JwtUtil jwtUtil) {
         this.quizService = quizService;
         this.jwtUtil=jwtUtil;
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<Void> createQuiz(@RequestHeader("Authorization") String authHeader,@RequestBody CreateQuizRequest quizRequest) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId=jwtUtil.getUserIdFromToken(token);
+        try {
+            quizService.createQuizzes(quizRequest.lectureText(), quizRequest.summaryId(), userId);
+            return ResponseEntity.status(200).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
     }
 
     @GetMapping("/get")

@@ -10,12 +10,13 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-
 @Service
 public class SummaryService {
     private final TranscriptRepository transcriptRepository;
     private final SummaryRepository summaryRepository;
     private final WebClient webClient;
+
+
 
     public SummaryService(SummaryRepository summaryRepository, TranscriptRepository transcriptRepository, @Value("${daglo.api.token}") String apiToken) {
         this.transcriptRepository = transcriptRepository;
@@ -96,6 +97,7 @@ public class SummaryService {
                     }
                 });
     }
+
 
     public Summary getSummaryById(Long summaryId) {
         return summaryRepository.findById(summaryId)

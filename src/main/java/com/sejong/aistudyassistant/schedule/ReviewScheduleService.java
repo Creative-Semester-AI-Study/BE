@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -108,6 +110,60 @@ public class ReviewScheduleService {
                 });
     }
 
+    public List<SubjectStatsDTO> updateAndGetSubjectStats(Long userId) {
+        LocalDate today = LocalDate.now();
+        int[] dayIntervals = {1, 3, 7, 15, 30};
+
+        // 오늘 이전의 특정 사용자의 모든 Transcript 조회
+        List<Transcript> transcripts = transcriptRepository.findByUserIdAndCreatedAtBefore(userId, today.atStartOfDay());
+
+        // Subject별 통계 계산
+        Map<Long, SubjectStatsDTO> subjectStatsMap = new HashMap<>();
+
+        for (Transcript transcript : transcripts) {
+            Subject subject = transcript.getSubject(); // Subject 참조를 통해 가져옴
+            if (subject == null) {
+                System.err.println("Subject not found for Transcript ID: " + transcript.getId());
+                continue;
+            }
+            Long subjectId = subject.getId();
+
+            for (int dayInterval : dayIntervals) {
+                LocalDate targetDate = transcript.getCreatedAt().toLocalDate().plusDays(dayInterval);
+
+                if (!targetDate.isAfter(today)) { // createAt + dayInterval <= 오늘
+                    boolean reviewed = checkIfReviewed(userId, transcript.getSummaryId(), targetDate, dayInterval);
+
+                    // SubjectStatsDTO 초기화 또는 업데이트
+                    subjectStatsMap.putIfAbsent(subjectId, new SubjectStatsDTO(
+                            subjectId,
+                            subject.getSubjectName(),
+                            0, // totalReviews
+                            0, // completedReviews
+                            0  // reviewRate
+                    ));
+
+                    SubjectStatsDTO stats = subjectStatsMap.get(subjectId);
+                    stats.setTotalReviews(stats.getTotalReviews() + 1);
+                    if (reviewed) {
+                        stats.setCompletedReviews(stats.getCompletedReviews() + 1);
+                    }
+                }
+            }
+        }
+
+        // ReviewRate 계산
+        for (SubjectStatsDTO stats : subjectStatsMap.values()) {
+            int totalReviews = stats.getTotalReviews();
+            int completedReviews = stats.getCompletedReviews();
+            stats.setReviewRate(totalReviews > 0 ? (int) Math.round((completedReviews / (double) totalReviews) * 100) : 0);
+        }
+
+        // DTO 리스트 반환
+        return new ArrayList<>(subjectStatsMap.values());
+    }
+
+//
     /*
     public void updateSubjectStatistics(Long userId, List<ReviewScheduleDTO> schedules) {
         for (ReviewScheduleDTO dto : schedules) {

@@ -82,66 +82,18 @@ public class StatsController {
         return ResponseEntity.ok(stats);
     }
 
-    /*
-    // 모든 과목의 전체 복습 통계를 갱신하고 반환
+    // 모든 과목의 복습 통계 갱신 및 반환
     @GetMapping("/subjects/total")
-    public ResponseEntity<List<SubjectStatsDTO>> updateAndGetTotalStats(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<List<SubjectStatsDTO>> updateAndGetSubjectStats(@RequestHeader("Authorization") String authHeader) {
+        // JWT 토큰에서 사용자 ID 추출
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);
 
-        // 오늘의 복습 스케줄 가져오기
-        LocalDate today = LocalDate.now();
-        List<ReviewScheduleDTO> schedules = reviewScheduleService.findReviewsForDate(userId, today);
+        // 과목 통계 갱신 및 가져오기
+        List<SubjectStatsDTO> subjectStats = reviewScheduleService.updateAndGetSubjectStats(userId);
 
-        // 각 과목의 TotalReviews 갱신
-        for (ReviewScheduleDTO schedule : schedules) {
-            Subject subject = subjectRepository.findByUserIdAndId(userId, schedule.getSummaryId())
-                    .orElse(null);
-            if (subject != null) {
-                subject.incrementTotalReviews();
-                subjectRepository.save(subject);
-            }
-        }
-
-        // 모든 과목의 통계 반환
-        List<Subject> subjects = subjectRepository.findAllByUserId(userId);
-        List<SubjectStatsDTO> statsList = subjects.stream()
-                .map(subject -> new SubjectStatsDTO(
-                        subject.getId(),
-                        subject.getSubjectName(),
-                        subject.getTotalReviews(),
-                        subject.getCompletedReviews(),
-                        (int) Math.round(subject.getReviewRate())
-                ))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(statsList);
+        // 응답 반환
+        return ResponseEntity.ok(subjectStats);
     }
-
-
-
-    // 모든 과목의 복습 통계
-    @GetMapping("/subjects")
-    public ResponseEntity<List<SubjectStatsDTO>> getSubjectStats(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", ""); // "Bearer " 제거
-        Long userId = jwtUtil.getUserIdFromToken(token); // JWT에서 userId 추출
-
-        // 해당 사용자(userId)의 모든 과목 조회
-        List<Subject> subjects = subjectRepository.findAllByUserId(userId);
-
-        // Subject 데이터를 SubjectStatsDTO로 변환
-        List<SubjectStatsDTO> statsList = subjects.stream()
-                .map(subject -> new SubjectStatsDTO(
-                        subject.getId(),
-                        subject.getSubjectName(),
-                        subject.getTotalReviews(),
-                        subject.getCompletedReviews(),
-                        (int) Math.round(subject.getReviewRate()) // 복습도는 정수로 변환
-                ))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(statsList);
-    }
-    */
 }
 

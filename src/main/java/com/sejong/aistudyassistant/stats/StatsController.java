@@ -1,6 +1,8 @@
 package com.sejong.aistudyassistant.stats;
 
 import com.sejong.aistudyassistant.jwt.JwtUtil;
+import com.sejong.aistudyassistant.quiz.QuizService;
+import com.sejong.aistudyassistant.quiz.dto.GetRecentQuizzesResponse;
 import com.sejong.aistudyassistant.schedule.ReviewScheduleDTO;
 import com.sejong.aistudyassistant.schedule.ReviewScheduleService;
 import com.sejong.aistudyassistant.subject.Subject;
@@ -20,10 +22,12 @@ public class StatsController {
 
     private final ReviewScheduleService reviewScheduleService;
     private final SubjectRepository subjectRepository;
+    private final QuizService quizService;
     private final JwtUtil jwtUtil;
 
-    public StatsController(ReviewScheduleService reviewScheduleService,SubjectRepository subjectRepository, JwtUtil jwtUtil) {
+    public StatsController(QuizService quizService,ReviewScheduleService reviewScheduleService,SubjectRepository subjectRepository, JwtUtil jwtUtil) {
         this.reviewScheduleService = reviewScheduleService;
+        this.quizService=quizService;
         this.subjectRepository = subjectRepository;
         this.jwtUtil = jwtUtil;
     }
@@ -87,16 +91,19 @@ public class StatsController {
 
     // 모든 과목의 복습 통계 갱신 및 반환
     @GetMapping("/subjects")
-    public ResponseEntity<List<SubjectStatsDTO>> updateAndGetSubjectStats(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<StatisticsDTO> updateAndGetSubjectStats(@RequestHeader("Authorization") String authHeader) {
         // JWT 토큰에서 사용자 ID 추출
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);
 
         // 과목 통계 갱신 및 가져오기
         List<SubjectStatsDTO> subjectStats = reviewScheduleService.updateAndGetSubjectStats(userId);
+        GetRecentQuizzesResponse getRecentQuizzes=quizService.getRecentQuizzes(userId);
+
+        StatisticsDTO statisticsDTO=new StatisticsDTO(subjectStats,getRecentQuizzes);
 
         // 응답 반환
-        return ResponseEntity.ok(subjectStats);
+        return ResponseEntity.ok(statisticsDTO);
     }
 }
 

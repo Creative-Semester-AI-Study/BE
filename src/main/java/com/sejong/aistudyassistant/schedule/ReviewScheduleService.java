@@ -162,30 +162,5 @@ public class ReviewScheduleService {
         // DTO 리스트 반환
         return new ArrayList<>(subjectStatsMap.values());
     }
-
-//
-    /*
-    public void updateSubjectStatistics(Long userId, List<ReviewScheduleDTO> schedules) {
-        for (ReviewScheduleDTO dto : schedules) {
-            // Subject 조회
-            Subject subject = subjectRepository.findByUserIdAndId(userId, dto.getSummaryId())
-                    .orElse(null);
-
-            if (subject == null) {
-                System.err.println("Subject not found for User ID: " + userId + " and Summary ID: " + dto.getSummaryId());
-                continue;
-            }
-
-            // 통계 갱신
-            subject.incrementTotalReviews();
-            if (dto.isReviewed()) {
-                subject.incrementCompletedReviews();
-            }
-
-            // 갱신된 Subject 저장
-            subjectRepository.save(subject);
-        }
-    }
-    */
 }
 

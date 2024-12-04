@@ -86,7 +86,7 @@ public class StatsController {
 
 
     // 모든 과목의 복습 통계 갱신 및 반환
-    @GetMapping("/subjects/total")
+    @GetMapping("/subjects")
     public ResponseEntity<List<SubjectStatsDTO>> updateAndGetSubjectStats(@RequestHeader("Authorization") String authHeader) {
         // JWT 토큰에서 사용자 ID 추출
         String token = authHeader.replace("Bearer ", "");

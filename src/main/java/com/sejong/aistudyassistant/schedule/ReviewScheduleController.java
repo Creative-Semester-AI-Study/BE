@@ -22,14 +22,11 @@ public class ReviewScheduleController {
     @GetMapping("/{date}")
     public ResponseEntity<List<ReviewScheduleDTO>> getReviewSchedules(
             @RequestHeader("Authorization") String authHeader,
-            @PathVariable String date) {  // 날짜를 경로에서 받음
-        String token = authHeader.replace("Bearer ", "");  // 헤더에서 토큰 추출
-        Long userId = jwtUtil.getUserIdFromToken(token);  // 토큰에서 사용자 ID 추출
+            @PathVariable("date") LocalDate date) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
 
-        // URL 경로에서 받은 날짜 문자열을 LocalDate로 변환
-        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
-
-        List<ReviewScheduleDTO> schedules = reviewScheduleService.findReviewsForDate(userId, localDate);
+        List<ReviewScheduleDTO> schedules = reviewScheduleService.findReviewsForDate(userId, date);
         return ResponseEntity.ok(schedules);
     }
 }

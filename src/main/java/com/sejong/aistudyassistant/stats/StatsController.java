@@ -70,8 +70,10 @@ public class StatsController {
                         .count();
                 double dailyReviewRate = (double) dailyCompletedReviews / dailyTotalReviews;
                 totalDailyReviewRate += dailyReviewRate;
+
+                // 리뷰가 있는 경우에만 totalDays 증가
+                totalDays++;
             }
-            totalDays++;
         }
 
         int averageReviewPercentage = totalDays > 0
@@ -81,6 +83,7 @@ public class StatsController {
         MonthStatsDTO stats = new MonthStatsDTO(averageReviewPercentage);
         return ResponseEntity.ok(stats);
     }
+
 
     // 모든 과목의 복습 통계 갱신 및 반환
     @GetMapping("/subjects/total")

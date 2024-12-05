@@ -32,7 +32,7 @@ public class QuizController {
         }
     }
 
-    @GetMapping("/get")
+    @PostMapping("/get")
     public ResponseEntity<List<GetQuizzesResponse>> getQuizzes(@RequestHeader("Authorization") String authHeader, @RequestBody GetQuizzesRequest quizRequest) {
 
         String token = authHeader.replace("Bearer ", "");
@@ -57,7 +57,7 @@ public class QuizController {
         }
     }
 
-    @GetMapping("/result")
+    @PostMapping("/result")
     public ResponseEntity<GetQuizResultResponse> getQuizResult(@RequestHeader("Authorization") String authHeader, @RequestBody GetQuizResultRequest quizRequest) {
 
         String token = authHeader.replace("Bearer ", "");

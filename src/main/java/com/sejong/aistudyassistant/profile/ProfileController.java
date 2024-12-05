@@ -17,7 +17,7 @@ public class ProfileController {
 
     // userId로 프로필 조회
     @GetMapping("/{userId}")
-    public ResponseEntity<ProfileResponse> getProfileByUserId(@PathVariable Long userId) {
+    public ResponseEntity<ProfileResponse> getProfileByUserId(@PathVariable("userId") Long userId) {
         return profileService.getProfileByUserId(userId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());

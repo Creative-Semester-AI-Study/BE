@@ -27,7 +27,7 @@ public class MyPageController {
 
     @GetMapping("/transcripts/{subjectId}")
     public ResponseEntity<List<TranscriptDTO>> getTranscriptsBySubjectId(
-            @PathVariable Long subjectId,
+            @PathVariable("subjectId") Long subjectId,
             @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);
@@ -37,7 +37,7 @@ public class MyPageController {
 
     @GetMapping("/transcripts/date/{date}")
     public ResponseEntity<List<TranscriptDTO>> getTranscriptsByDate(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);

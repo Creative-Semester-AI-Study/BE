@@ -57,4 +57,8 @@ public class MyPageService {
                 transcript.getQuizId()
         );
     }
+
+    public List<Subject> getAllSubjectsByUserId(Long userId) {
+        return subjectRepository.findAllByUserId(userId);
+    }
 }

@@ -40,7 +40,7 @@ public class TranscriptionController {
 
     @GetMapping("/{transcriptId}")
     public ResponseEntity<TranscriptDTO> getTranscriptById(
-            @PathVariable Long transcriptId,
+            @PathVariable("transcriptId") Long transcriptId,
             @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);

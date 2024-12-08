@@ -26,13 +26,13 @@ public class SummaryController {
     }
 
     @GetMapping("/{summaryId}")
-    public ResponseEntity<SummaryResponseDto> getSummaryById(@PathVariable Long summaryId) {
+    public ResponseEntity<SummaryResponseDto> getSummaryById(@PathVariable("summaryId") Long summaryId) {
         Summary summary = summaryService.getSummaryById(summaryId);
         return ResponseEntity.ok(new SummaryResponseDto(summary.getId(), summary.getSummaryText(), summary.getTranscriptId(), summary.getUserId()));
     }
 
     @PutMapping("/{summaryId}")
-    public ResponseEntity<SummaryResponseDto> updateSummary(@PathVariable Long summaryId, @RequestBody Map<String, String> updateData) {
+    public ResponseEntity<SummaryResponseDto> updateSummary(@PathVariable("summaryId") Long summaryId, @RequestBody Map<String, String> updateData) {
         String newSummaryText = updateData.get("summaryText");
         Summary updatedSummary = summaryService.updateSummary(summaryId, newSummaryText);
         return ResponseEntity.ok(new SummaryResponseDto(updatedSummary.getId(), updatedSummary.getSummaryText(), updatedSummary.getTranscriptId(), updatedSummary.getUserId()));

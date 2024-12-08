@@ -116,21 +116,4 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/{userId}/getUserInfo")
-    public ResponseEntity<String> getuserinfo(@PathVariable String userId) throws JsonProcessingException {
-        User findUser = userRepository.findUserById(Long.valueOf(userId));
-
-        Map<String, Object> userInfoMap = new HashMap<>();
-        userInfoMap.put("id", findUser.getUserId());
-        userInfoMap.put("name", findUser.getName());
-        userInfoMap.put("department", findUser.getDepartment());
-        userInfoMap.put("grade", findUser.getGrade());
-        userInfoMap.put("status", findUser.getStatus());
-
-        // 프로필 정보 주석 처리
-        // userInfoMap.put("image", findUser.getProfile().getImagePath());
-
-        String userInfoJson = mapper.writeValueAsString(userInfoMap);
-        return ResponseEntity.ok(userInfoJson);
-    }
 }

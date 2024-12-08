@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.sejong.aistudyassistant.subject.Subject;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -43,6 +44,14 @@ public class MyPageController {
         Long userId = jwtUtil.getUserIdFromToken(token);
         List<TranscriptDTO> transcripts = myPageService.getTranscriptsByUserIdAndDate(userId, date);
         return ResponseEntity.ok(transcripts);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Subject>> getAllSubjects(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        List<Subject> subjects = myPageService.getAllSubjectsByUserId(userId);
+        return ResponseEntity.ok(subjects);
     }
 }
 

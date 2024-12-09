@@ -6,6 +6,7 @@ import com.sejong.aistudyassistant.profile.ProfileRepository;
 
 import com.sejong.aistudyassistant.subject.dto.*;
 
+import com.sejong.aistudyassistant.summary.SummaryRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,9 @@ public class SubjectService {
 
     @Autowired
     private ProfileRepository profileRepository;
+
+    @Autowired
+    private SummaryRepository summaryRepository;
 
 
     private static final Logger logger = LoggerFactory.getLogger(SubjectService.class);
@@ -181,7 +185,7 @@ public class SubjectService {
 
         List<TargetDaySubjectResponse> response = sortedSubjects.stream()
                 .map(subject -> {
-                    String learningState = getLearningStatus(subject.getStartTime(), subject.getEndTime());
+                    String learningState = getLearningStatus(subject.getId());
                     return new TargetDaySubjectResponse(
                             subject.getId(),
                             subject.getProfileId(),
@@ -236,15 +240,12 @@ public class SubjectService {
     }
 
     @Transactional
-    public String getLearningStatus(LocalTime startTime, LocalTime endTime) {
-        LocalTime currentTime = LocalTime.now();
-
-        if (currentTime.isBefore(startTime)) {
-            return "학습 전";
-        } else if (currentTime.isAfter(startTime) && currentTime.isBefore(endTime)) {
-            return "녹음 시작";
+    public String getLearningStatus(Long subjectId) {
+        boolean hasSummary = summaryRepository.existsBySubjectId(subjectId); // subjectId로 확인
+        if (hasSummary) {
+            return "학습 후";
         } else {
-            return "요약 보기";
+            return "학습 전";
         }
     }
 

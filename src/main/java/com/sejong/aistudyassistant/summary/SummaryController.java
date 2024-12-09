@@ -47,6 +47,7 @@ public class SummaryController {
 
         String token = authHeader.replace("Bearer ", "");
         Long userId=jwtUtil.getUserIdFromToken(token);
-        return ResponseEntity.ok(summaryService.selfCreateSummary(userId,request.transcriptId(),request.summary()));
+        return ResponseEntity.ok(summaryService.selfCreateSummary(userId,request.subjectId(),request.summary()));
     }
+
 }

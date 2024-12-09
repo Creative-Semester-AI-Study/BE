@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -110,6 +111,7 @@ public class SummaryService {
         summary.setSummaryText(text);
         summary.setTranscriptId(transcriptId);
         summary.setUserId(userId);
+        summary.setCreatedAt(LocalDateTime.now());
         Summary savecSummary=summaryRepository.save(summary);
         return savecSummary;
     }

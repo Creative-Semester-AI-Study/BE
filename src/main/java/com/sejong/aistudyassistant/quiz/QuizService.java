@@ -197,21 +197,23 @@ public class QuizService {
 
         List<QuizAttempt> quizList=quizAttemptRepository.findByUserIdAndSummaryIdAndQuizIdBetween(userId,summaryId,startId,startId+4);
         int correctAnswers=0;
+        String date=null;
 
         for(QuizAttempt quiz: quizList){
             correctAnswers=correctAnswers+(quiz.getCorrect()? 1:0);
+            date=quiz.getAttemptDate();
         }
 
         Optional<Subject> subject=subjectRepository.findById(subjectId);
-        QuizAttempt quizAttempt=quizAttemptRepository.findByQuizId(1L);
 
-        GetQuizResultResponse resultResponse=new GetQuizResultResponse(userId, summaryId,quizAttempt.getAttemptDate(),subject.get().getSubjectName(),5,correctAnswers);
+        GetQuizResultResponse resultResponse=new GetQuizResultResponse(userId, summaryId,date,subject.get().getSubjectName(),5,correctAnswers);
         return resultResponse;
     }
 
     public GetRecentQuizzesResponse getRecentQuizzes(Long userId){
 
         List<QuizAttempt> quizAttempt=quizAttemptRepository.findTop5ByOrderByQuizAttemptIdDesc();
+        System.out.println("Quiz Attempts: " + quizAttempt);
         List<QuizDetailResponse> quizzes=new ArrayList<>();
 
         String date=null;
@@ -237,16 +239,15 @@ public class QuizService {
         }
 
         Optional<Summary> summary=summaryRepository.findById(findSummaryId);
-        Optional<Transcript> transcript=transcriptRepository.findById(summary.get().getTranscriptId());
-        Subject subject=transcript.get().getSubject();
-        Integer round=calculateRound(transcript.get().getCreatedAt(),LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        Optional<Subject> subject=subjectRepository.findById(summary.get().getSubjectId());
+        Integer round=calculateRound(summary.get().getCreatedAt(), LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 .atStartOfDay());
-        GetQuizResultResponse quizResultResponse=getQuizResult(userId,summary.get().getId(),subject.getId(),round);
+        GetQuizResultResponse quizResultResponse=getQuizResult(userId,summary.get().getId(),subject.get().getId(),round);
         Integer correctAnswers=quizResultResponse.correctAnswers();
 
             return new GetRecentQuizzesResponse(
                     userId,
-                    subject.getSubjectName(),
+                    subject.get().getSubjectName(),
                     round,
                     date,
                     quizzes,

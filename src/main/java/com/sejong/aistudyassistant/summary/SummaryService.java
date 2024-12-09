@@ -103,4 +103,14 @@ public class SummaryService {
         return summaryRepository.findById(summaryId)
                 .orElseThrow(() -> new RuntimeException("Summary not found with id: " + summaryId));
     }
+
+    public Summary selfCreateSummary(Long userId, Long transcriptId,String text){
+
+        Summary summary=new Summary();
+        summary.setSummaryText(text);
+        summary.setTranscriptId(transcriptId);
+        summary.setUserId(userId);
+        Summary savecSummary=summaryRepository.save(summary);
+        return savecSummary;
+    }
 }

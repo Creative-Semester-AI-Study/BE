@@ -13,4 +13,5 @@ public interface SummaryRepository extends JpaRepository<Summary, Long> {
 
     Summary findByUserId(Long userId);
 
+    boolean existsBySubjectId(Long subjectId);
 }

@@ -2,6 +2,8 @@ package com.sejong.aistudyassistant.summary;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class Summary {
 
@@ -9,6 +11,18 @@ public class Summary {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long transcriptId;
+
+    @Column(columnDefinition = "TEXT")
+    private String summaryText;
+
+    private Long userId;
+
+    private Long subjectId; // 추가된 과목 ID 필드
+
+    private LocalDateTime createdAt; // 추가된 생성 날짜 필드
+
+    // Getter와 Setter 추가
     public Long getId() {
         return id;
     }
@@ -16,21 +30,6 @@ public class Summary {
     public void setId(Long id) {
         this.id = id;
     }
-
-    private Long transcriptId;
-
-    @Column(columnDefinition = "TEXT")
-    private String summaryText;
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    private Long userId;
 
     public Long getTranscriptId() {
         return transcriptId;
@@ -46,5 +45,29 @@ public class Summary {
 
     public void setSummaryText(String summaryText) {
         this.summaryText = summaryText;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

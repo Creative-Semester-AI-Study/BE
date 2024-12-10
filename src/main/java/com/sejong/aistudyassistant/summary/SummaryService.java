@@ -7,9 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class SummaryService {
@@ -115,4 +118,12 @@ public class SummaryService {
         Summary savecSummary=summaryRepository.save(summary);
         return savecSummary;
     }
+
+    public Summary getSummaryByDateAndSubjectId(Long userId, LocalDate date, Long subjectId) {
+        return summaryRepository.findByUserIdAndSubjectIdAndCreatedDate(userId, subjectId, date)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "Summary not found for userId: " + userId + ", date: " + date + ", subjectId: " + subjectId));
+    }
+
+
 }

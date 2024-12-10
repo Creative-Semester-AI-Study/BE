@@ -2,6 +2,7 @@ package com.sejong.aistudyassistant.summary;
 
 
 import com.sejong.aistudyassistant.jwt.JwtUtil;
+import com.sejong.aistudyassistant.summary.dto.GetSummaryRequest;
 import com.sejong.aistudyassistant.summary.dto.SelfSummaryCreateRequest;
 import com.sejong.aistudyassistant.summary.dto.SummaryResponseDto;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,17 @@ public class SummaryController {
         String token = authHeader.replace("Bearer ", "");
         Long userId=jwtUtil.getUserIdFromToken(token);
         return ResponseEntity.ok(summaryService.selfCreateSummary(userId,request.subjectId(),request.createdDate(),request.summary()));
+    }
+
+
+    @PostMapping("/find/summary")
+    public ResponseEntity<Summary> getSummaryByDateAndSubjectId(@RequestHeader("Authorization") String authHeader,
+                                                                @RequestBody GetSummaryRequest request) {
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+
+        Summary summary = summaryService.getSummaryByDateAndSubjectId(userId, request.date(), request.subjectId());
+        return ResponseEntity.ok(summary);
     }
 
 }

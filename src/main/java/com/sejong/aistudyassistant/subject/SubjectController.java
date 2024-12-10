@@ -89,4 +89,5 @@ public class SubjectController {
         NextSubjectResponse response = subjectService.getNextSubject(userId);
         return ResponseEntity.ok(response);
     }
+
 }

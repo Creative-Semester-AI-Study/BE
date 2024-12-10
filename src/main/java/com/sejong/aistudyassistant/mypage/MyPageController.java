@@ -38,6 +38,7 @@ public class MyPageController {
 
     @GetMapping("/transcripts/date/{date}")
     public ResponseEntity<List<TranscriptDTO>> getTranscriptsByDate(
+
             @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");

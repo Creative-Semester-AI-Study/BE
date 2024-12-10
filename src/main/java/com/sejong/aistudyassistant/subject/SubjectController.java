@@ -25,7 +25,7 @@ public class SubjectController {
 
     //특정 과목 조회
     @GetMapping("/{subjectId}")
-    public ResponseEntity<CheckSubjectResponse> checkSubject(@PathVariable Long subjectId, @RequestHeader("Authorization") String authHeader){
+    public ResponseEntity<CheckSubjectResponse> checkSubject(@PathVariable("subjectId") Long subjectId, @RequestHeader("Authorization") String authHeader){
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);
         CheckSubjectResponse response = subjectService.checkSubject(userId, subjectId);
@@ -47,7 +47,7 @@ public class SubjectController {
     // 특정 유저의 특정 과목 삭제
     @DeleteMapping("/{subjectId}")
     public ResponseEntity<DeleteSubjectResponse> deleteSubject(
-            @PathVariable Long subjectId, @RequestHeader("Authorization") String authHeader) {
+            @PathVariable("subjectId") Long subjectId, @RequestHeader("Authorization") String authHeader) {
 
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);
@@ -60,7 +60,7 @@ public class SubjectController {
     @PutMapping("/{subjectId}")
     public ResponseEntity<ModifySubjectResponse> modifySubject(
             @RequestBody ModifySubjectRequest request,
-            @PathVariable Long subjectId, @RequestHeader("Authorization") String authHeader) {
+            @PathVariable("subjectId") Long subjectId, @RequestHeader("Authorization") String authHeader) {
 
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);

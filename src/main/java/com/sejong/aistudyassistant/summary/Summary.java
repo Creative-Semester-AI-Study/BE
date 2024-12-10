@@ -1,5 +1,6 @@
 package com.sejong.aistudyassistant.summary;
 
+import com.sejong.aistudyassistant.subject.Subject;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -18,9 +19,13 @@ public class Summary {
 
     private Long userId;
 
-    private Long subjectId; // 추가된 과목 ID 필드
+    private Long subjectId; // subjectId 필드 유지
 
-    private LocalDateTime createdAt; // 추가된 생성 날짜 필드
+    @ManyToOne
+    @JoinColumn(name = "subjectId", insertable = false, updatable = false) // 연관 관계 설정
+    private Subject subject; // Subject 엔티티 매핑
+
+    private LocalDateTime createdAt;
 
     // Getter와 Setter 추가
     public Long getId() {
@@ -61,6 +66,14 @@ public class Summary {
 
     public void setSubjectId(Long subjectId) {
         this.subjectId = subjectId;
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 
     public LocalDateTime getCreatedAt() {

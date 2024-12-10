@@ -15,7 +15,4 @@ public interface TranscriptRepository extends JpaRepository<Transcript, Long> {
 
     List<Transcript> findByUserIdAndCreatedAtBetween(Long userId, LocalDateTime startOfDay, LocalDateTime endOfDay);
     List<Transcript> findBySubject_Id(Long subjectId);
-
-    //과목 통계 메소드에 사용
-    List<Transcript> findByUserIdAndCreatedAtBefore(Long userId, LocalDateTime dateTime);
 }

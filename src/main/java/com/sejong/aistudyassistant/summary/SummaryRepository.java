@@ -19,10 +19,14 @@ public interface SummaryRepository extends JpaRepository<Summary, Long> {
 
     boolean existsBySubjectId(Long subjectId);
 
+    List<Summary> findByUserIdAndCreatedAtBetween(Long userId, LocalDateTime startOfDay, LocalDateTime endOfDay);
+    List<Summary> findByUserIdAndCreatedAtBefore(Long userId, LocalDateTime dateTime);
+
     @Query("SELECT s FROM Summary s WHERE s.userId = :userId AND s.subjectId = :subjectId AND DATE(s.createdAt) = :createdDate")
     Optional<Summary> findByUserIdAndSubjectIdAndCreatedDate(@Param("userId") Long userId,
                                                              @Param("subjectId") Long subjectId,
                                                              @Param("createdDate") LocalDate createdDate);
+
 
 
 }

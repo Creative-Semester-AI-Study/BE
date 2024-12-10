@@ -29,4 +29,5 @@ public interface SummaryRepository extends JpaRepository<Summary, Long> {
 
 
 
+    List<Summary> findBySubjectId(Long subjectId);
 }

@@ -125,23 +125,7 @@ public class SubjectService {
                 savedSubject.getUserId()
         );
     }
-/*
-    // 특정 유저의 특정 과목 삭제 (userId를 사용하여)
-    @Transactional
-    public boolean deleteSubject(Long userId, Long subjectId) {
-        logger.info("Attempting to delete subject with id {} for user {}", subjectId, userId);
 
-        Subject subject = subjectRepository.findByUserIdAndId(userId, subjectId)
-                .orElseThrow(() -> {
-                    logger.error("Subject not found for userId: {} and subjectId: {}", userId, subjectId);
-                    return new RuntimeException("Subject not found for userId: " + userId + " and subjectId: " + subjectId);
-                });
-
-        logger.info("Subject found. Deleting subject with id: {}", subjectId);
-        subjectRepository.delete(subject);
-        return true;
-    }
-*/
     @Transactional
     public boolean deleteSubject(Long userId, Long subjectId) {
     logger.info("Attempting to delete subject with id {} for user {}", subjectId, userId);

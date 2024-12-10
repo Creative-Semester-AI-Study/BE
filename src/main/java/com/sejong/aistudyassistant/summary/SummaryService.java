@@ -120,9 +120,9 @@ public class SummaryService {
     }
 
     public Summary getSummaryByDateAndSubjectId(Long userId, LocalDate date, Long subjectId) {
-        return summaryRepository.findByUserIdAndSubjectIdAndCreatedDate(userId, subjectId, date)
+        return summaryRepository.findBySubjectIdAndCreatedDate(subjectId, date)
                 .orElseThrow(() -> new NoSuchElementException(
-                        "Summary not found for userId: " + userId + ", date: " + date + ", subjectId: " + subjectId));
+                        "Summary not found for date: " + date + ", subjectId: " + subjectId));
     }
 
 

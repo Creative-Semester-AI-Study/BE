@@ -105,13 +105,13 @@ public class SummaryService {
                 .orElseThrow(() -> new RuntimeException("Summary not found with id: " + summaryId));
     }
 
-    public Summary selfCreateSummary(Long userId,Long subjectId,String text){
+    public Summary selfCreateSummary(Long userId,Long subjectId,LocalDateTime createdDate,String text){
 
         Summary summary=new Summary();
         summary.setSummaryText(text);
         summary.setUserId(userId);
         summary.setSubjectId(subjectId);
-        summary.setCreatedAt(LocalDateTime.now());
+        summary.setCreatedAt(createdDate);
         Summary savecSummary=summaryRepository.save(summary);
         return savecSummary;
     }

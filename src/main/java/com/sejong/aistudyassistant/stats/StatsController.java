@@ -1,6 +1,8 @@
 package com.sejong.aistudyassistant.stats;
 
 import com.sejong.aistudyassistant.jwt.JwtUtil;
+import com.sejong.aistudyassistant.quiz.QuizService;
+import com.sejong.aistudyassistant.quiz.dto.GetRecentQuizzesResponse;
 import com.sejong.aistudyassistant.schedule.ReviewScheduleDTO;
 import com.sejong.aistudyassistant.schedule.ReviewScheduleService;
 import com.sejong.aistudyassistant.subject.Subject;
@@ -20,10 +22,12 @@ public class StatsController {
 
     private final ReviewScheduleService reviewScheduleService;
     private final SubjectRepository subjectRepository;
+    private final QuizService quizService;
     private final JwtUtil jwtUtil;
 
-    public StatsController(ReviewScheduleService reviewScheduleService,SubjectRepository subjectRepository, JwtUtil jwtUtil) {
+    public StatsController(QuizService quizService,ReviewScheduleService reviewScheduleService,SubjectRepository subjectRepository, JwtUtil jwtUtil) {
         this.reviewScheduleService = reviewScheduleService;
+        this.quizService=quizService;
         this.subjectRepository = subjectRepository;
         this.jwtUtil = jwtUtil;
     }

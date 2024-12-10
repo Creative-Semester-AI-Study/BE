@@ -71,7 +71,7 @@ public class SubjectController {
 
     // 특정 날짜 과목 조회
     @GetMapping("/check/{date}")
-    public ResponseEntity<List<TargetDaySubjectResponse>> getSubjectsByUserIdAndDate(@PathVariable ("date") LocalDate date,
+    public ResponseEntity<List<TargetDaySubjectResponse>> getSubjectsByUserIdAndDate(@PathVariable("date") LocalDate date,
                                                                                      @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);

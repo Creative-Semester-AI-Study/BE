@@ -1,6 +1,8 @@
 package com.sejong.aistudyassistant.summary;
 
 
+import com.sejong.aistudyassistant.jwt.JwtUtil;
+import com.sejong.aistudyassistant.summary.dto.SelfSummaryCreateRequest;
 import com.sejong.aistudyassistant.summary.dto.SummaryResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +14,12 @@ import java.util.Map;
 @RequestMapping("/api/summaries")
 public class SummaryController {
     private final SummaryService summaryService;
+    private final JwtUtil jwtUtil;
 
 
-    public SummaryController(SummaryService summaryService) {
+    public SummaryController(SummaryService summaryService,JwtUtil jwtUtil) {
         this.summaryService = summaryService;
+        this.jwtUtil=jwtUtil;
     }
 
     @PostMapping
@@ -37,4 +41,13 @@ public class SummaryController {
         Summary updatedSummary = summaryService.updateSummary(summaryId, newSummaryText);
         return ResponseEntity.ok(new SummaryResponseDto(updatedSummary.getId(), updatedSummary.getSummaryText(), updatedSummary.getTranscriptId(), updatedSummary.getUserId()));
     }
+
+    @PostMapping("/self/create")
+    public ResponseEntity<Summary> selfCreateSummary(@RequestHeader("Authorization") String authHeader,@RequestBody SelfSummaryCreateRequest request){
+
+        String token = authHeader.replace("Bearer ", "");
+        Long userId=jwtUtil.getUserIdFromToken(token);
+        return ResponseEntity.ok(summaryService.selfCreateSummary(userId,request.subjectId(),request.summary()));
+    }
+
 }

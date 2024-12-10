@@ -7,15 +7,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-
 
 @Service
 public class SummaryService {
     private final TranscriptRepository transcriptRepository;
     private final SummaryRepository summaryRepository;
     private final WebClient webClient;
+
+
 
     public SummaryService(SummaryRepository summaryRepository, TranscriptRepository transcriptRepository, @Value("${daglo.api.token}") String apiToken) {
         this.transcriptRepository = transcriptRepository;
@@ -97,8 +99,20 @@ public class SummaryService {
                 });
     }
 
+
     public Summary getSummaryById(Long summaryId) {
         return summaryRepository.findById(summaryId)
                 .orElseThrow(() -> new RuntimeException("Summary not found with id: " + summaryId));
+    }
+
+    public Summary selfCreateSummary(Long userId,Long subjectId,String text){
+
+        Summary summary=new Summary();
+        summary.setSummaryText(text);
+        summary.setUserId(userId);
+        summary.setSubjectId(subjectId);
+        summary.setCreatedAt(LocalDateTime.now());
+        Summary savecSummary=summaryRepository.save(summary);
+        return savecSummary;
     }
 }

@@ -18,4 +18,6 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt,Long> {
 
     List<QuizAttempt> findTop5ByOrderByQuizAttemptIdDesc();
 
+    void deleteByQuizId(Long quizId);
+
 }

@@ -4,8 +4,15 @@ import com.sejong.aistudyassistant.mypage.MyPage;
 import com.sejong.aistudyassistant.mypage.MyPageRepository;
 import com.sejong.aistudyassistant.profile.ProfileRepository;
 
+import com.sejong.aistudyassistant.quiz.Entity.Quiz;
+import com.sejong.aistudyassistant.quiz.Entity.QuizAttempt;
+import com.sejong.aistudyassistant.quiz.Repository.QuizAttemptRepository;
+import com.sejong.aistudyassistant.quiz.Repository.QuizRepository;
+import com.sejong.aistudyassistant.stt.Transcript;
+import com.sejong.aistudyassistant.stt.TranscriptRepository;
 import com.sejong.aistudyassistant.subject.dto.*;
 
+import com.sejong.aistudyassistant.summary.Summary;
 import com.sejong.aistudyassistant.summary.SummaryRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -36,6 +43,15 @@ public class SubjectService {
 
     @Autowired
     private SummaryRepository summaryRepository;
+
+    @Autowired
+    private QuizRepository quizRepository;
+
+    @Autowired
+    private QuizAttemptRepository quizAttemptRepository;
+
+    @Autowired
+    private TranscriptRepository transcriptRepository;
 
 
     private static final Logger logger = LoggerFactory.getLogger(SubjectService.class);
@@ -109,7 +125,7 @@ public class SubjectService {
                 savedSubject.getUserId()
         );
     }
-
+/*
     // 특정 유저의 특정 과목 삭제 (userId를 사용하여)
     @Transactional
     public boolean deleteSubject(Long userId, Long subjectId) {
@@ -125,6 +141,46 @@ public class SubjectService {
         subjectRepository.delete(subject);
         return true;
     }
+*/
+    @Transactional
+    public boolean deleteSubject(Long userId, Long subjectId) {
+    logger.info("Attempting to delete subject with id {} for user {}", subjectId, userId);
+
+    // Subject 조회
+    Subject subject = subjectRepository.findByUserIdAndId(userId, subjectId)
+            .orElseThrow(() -> {
+                logger.error("Subject not found for userId: {} and subjectId: {}", userId, subjectId);
+                return new RuntimeException("Subject not found for userId: " + userId + " and subjectId: " + subjectId);
+            });
+
+        List<Transcript> transcripts = transcriptRepository.findBySubjectId(subjectId);
+        if (!transcripts.isEmpty()) {
+            transcriptRepository.deleteAll(transcripts);
+        }
+
+    // Summary 삭제
+    List<Summary> summaries = summaryRepository.findBySubjectId(subjectId);
+    if (!summaries.isEmpty()) {
+        summaries.forEach(summary -> {
+            // Quiz 삭제
+            List<Quiz> quizzes = quizRepository.findBySummaryId(summary.getId());
+            if (!quizzes.isEmpty()) {
+                quizzes.forEach(quiz -> {
+                    // QuizOption 삭제는 CascadeType.ALL로 처리
+                    quizAttemptRepository.deleteByQuizId(quiz.getQuizId()); // QuizAttempt 삭제
+                });
+                quizRepository.deleteAll(quizzes); // Quiz 삭제
+            }
+            summaryRepository.delete(summary); // Summary 삭제
+        });
+    }
+
+    // Subject 삭제
+    subjectRepository.delete(subject);
+    logger.info("Successfully deleted subject with id: {}", subjectId);
+
+    return true;
+}
 
     // 특정 유저의 특정 과목 수정 (userId를 사용하여)
     @Transactional

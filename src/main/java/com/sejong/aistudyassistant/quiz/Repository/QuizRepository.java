@@ -15,4 +15,6 @@ public interface QuizRepository extends JpaRepository<Quiz,Long> {
     List<Quiz> findByUserIdAndSummaryIdAndQuizIdBetween(Long userId, Long summaryId, Long startId, Long endId);
     @Query("SELECT MIN(q.quizId) FROM Quiz q WHERE q.summaryId = :summaryId")
     Long findFirstQuizIdBySummaryId(@Param("summaryId") Long summaryId);
+
+    List<Quiz> findBySummaryId(Long summaryId);
 }
